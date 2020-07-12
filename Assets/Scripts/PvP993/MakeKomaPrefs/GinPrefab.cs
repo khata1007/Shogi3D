@@ -15,10 +15,10 @@ namespace MakeKomaPrefs
         void Start()
         {
             float[] sunpou = new float[3];
-            for (int i = 0; i < 3; i++) sunpou[i] = PvP993.KomaInfo.sunpou[3, i];
+            for (int i = 0; i < 3; i++) sunpou[i] = PvP993.Koma.sunpou[3, i];
 
             float[] degs = new float[3];
-            for (int i = 0; i < 3; i++) degs[i] = PvP993.KomaInfo.deg[3, i];
+            for (int i = 0; i < 3; i++) degs[i] = PvP993.Koma.deg[3, i];
 
             float c = sunpou[0], b = sunpou[1], d = sunpou[2];
             float P = Mathf.Deg2Rad * degs[0], R = Mathf.Deg2Rad * degs[1], Gamma = Mathf.Deg2Rad * degs[2];
