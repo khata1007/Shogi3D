@@ -12,6 +12,8 @@ namespace PvP993
         private int yLength = Choose.InitialSetting.yLength;
         private int zLength = Choose.InitialSetting.zLength;
 
+        private bool mouseDetectable = true;
+
         [SerializeField, Range(0.5f, 0.9f)] private float scale2D = 0.7f;
 
         public Koma koma;
@@ -59,12 +61,16 @@ namespace PvP993
             koma_on_board3D = new GameObject[xLength, yLength, zLength];
             koma_on_board2D = new GameObject[xLength, yLength, zLength];
             boardstate = new int[xLength, yLength, zLength];
+            //領域確保した段階で配列の参照をKomaクラスの方にも渡す. 確保前に渡すとPutKomaでぬるぽ吐く. どうして...
+            koma.Boardstate = boardstate;
+            koma.Koma3D = koma_on_board3D;
+            koma.Koma2D = koma_on_board2D;
 
             board.CreateBoard(orangeBox3D, greenBox3D, orangeBox2D, greenBox2D);
             board.CreateFrame(frameX3D, frameZ3D, frameX2D, frameZ2D);
 
             //koma_on_Board3D/2Dをnullで初期化
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
                 for(int y = 0; y < yLength; y++)
                 {
@@ -72,49 +78,27 @@ namespace PvP993
                     {
                         koma_on_board3D[x, y, z] = null;
                         koma_on_board2D[x, y, z] = null;
+                        boardstate[x, y, z] = 0;
                     }
                 }
             }
 
-            //-----------------初期配置--------------------//
-            //歩の配置
-            for (int x = 0; x < xLength; x++)
-            {
-                koma.PutKoma(1, Koma.Kind.Fu, x, 0, 2, koma_on_board3D, koma_on_board2D);
-                koma.PutKoma(-1, Koma.Kind.Fu, x, 2, zLength - 3, koma_on_board3D, koma_on_board2D);
-            }
-            //銀桂香の配置
-            for(int x = 0; x <= 2; x++)
-            {
-                Koma.Kind k = (Koma.Kind) Enum.ToObject(typeof(Koma.Kind), x + 2);
-                koma.PutKoma(1, k, x, 0, 0, koma_on_board3D, koma_on_board2D);
-                koma.PutKoma(1, k, 8 - x, 0, 0, koma_on_board3D, koma_on_board2D);
-                koma.PutKoma(-1, k, x, 2, 8, koma_on_board3D, koma_on_board2D);
-                koma.PutKoma(-1, k, 8 - x, 2, 8, koma_on_board3D, koma_on_board2D);
-            }
-            //その他の駒の配置
-            koma.PutKoma(1, Koma.Kind.Kin, 3, 0, 0, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(1, Koma.Kind.Kin, 5, 0, 0, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(-1, Koma.Kind.Kin, 3, 2, 8, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(-1, Koma.Kind.Kin, 5, 2, 8, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(1, Koma.Kind.Ou, 4, 0, 0, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(-1,Koma.Kind.Gyo, 4, 2, 8, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(1, Koma.Kind.Kak, 1, 0, 1, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(-1,Koma.Kind.Kak, 7, 2, 7, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(1, Koma.Kind.Hi, 7, 0, 1, koma_on_board3D, koma_on_board2D);
-            koma.PutKoma(-1,Koma.Kind.Hi, 1, 2, 7, koma_on_board3D, koma_on_board2D);
+            koma.InitialSet(); //初期配置
 
-
-
-            Debug.Log(boardstate[0, 0, 0]);
             boardstate[0, 0, 0] = koma.Nari(koma_on_board3D[0, 0, 0]);
-            Debug.Log(boardstate[0, 0, 0]);
         }
 
         // Update is called once per frame
         void Update()
         {
-
+            if (mouseDetectable)
+            {
+                if (Input.GetMouseButtonUp(0))
+                {
+                    Vector3 mousePosition = Input.mousePosition;
+                    Debug.Log("Left: " + mousePosition);
+                }
+            }
         }
 
         public void ChangeDimension()
@@ -158,5 +142,7 @@ namespace PvP993
         {
             Debug.Log("Koma selected.");
         }
+
+        public bool MouseDetectable { get { return mouseDetectable; } set { mouseDetectable = value; } }
     }
 }

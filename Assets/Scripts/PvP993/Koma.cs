@@ -11,6 +11,10 @@ namespace PvP993
         private int yLength = Choose.InitialSetting.yLength;
         private int zLength = Choose.InitialSetting.zLength;
         private float komaScale2D;
+        private GameObject[,,] koma3D;
+        private GameObject[,,] koma2D;
+        private int[,,] boardstate;
+        public GameObject[] pieces = new GameObject[9 * 3];
         public enum Kind { Emp, Fu, Kyo, Kei, Gin, Kak, Hi, Kin, Ou, Gyo, To, NariKyo, NariKei, NariGin, Uma, Ryu};
 
         //-----------------------駒の設計図-----------------------//
@@ -39,21 +43,49 @@ namespace PvP993
             {146.0f, 80.5f, 85.0f },
             {146.0f, 80.5f, 85.0f },
         };
+        //---------------ここまで駒の設計図-----------------//
 
-
-        private static readonly Dictionary<string, string> nari =
-            new Dictionary<string, string>()
+        private static readonly Dictionary<Kind, int> kind_to_piece = //PutKomaでkindを目的のpiecesに変換するためのdictionary
+            new Dictionary<Kind, int>()
         {
-                {"歩", "と" },
-                {"香\n車", "成\n香" },
-                {"桂\n馬", "成\n桂" },
-                {"銀\n将", "成\n銀" },
-                {"金\n将", "金\n将" },
-                {"角\n行", "馬" },
-                {"飛\n車", "竜" },
-                {"王\n将", "王\n将" },
-                {"玉\n将", "玉\n将" },
+                {Kind.Fu, 0 },
+                {Kind.Kyo, 3 },
+                {Kind.Kei, 6 },
+                {Kind.Gin, 9 },
+                {Kind.Kin, 12 },
+                {Kind.Kak, 15 },
+                {Kind.Hi, 18 },
+                {Kind.Ou, 21 },
+                {Kind.Gyo, 24 },
         };
+
+        private Color[] komaColor = new Color[]
+        {
+            new Color(238, 130, 238),
+            new Color(255, 0, 0),
+            new Color(255, 182, 193),
+        };
+
+        private static readonly Dictionary<int, int> komaGet =
+            new Dictionary<int, int>()
+        {
+                {1, -1 }, {-1, 1 },
+                {2, -2 }, {-2, 2 },
+                {3, -3 }, {-3, 3 },
+                {4, -4 }, {-4, 4 },
+                {5, -5 }, {-5, 5 },
+                {6, -6 }, {-6, 6 },
+                {7, -7 }, {-7, 7 },
+                {8, -8 }, {-8, 8 },
+                {9, -9 }, {-9, 9 },
+                {10, -1 }, {-10, 1 },
+                {11, -2 }, {-11, 2 },
+                {12, -3 }, {-12, 3 },
+                {13, -4 }, {-13, 4 },
+                {14, -5 }, {-14, 5 },
+                {15, -6 }, {-15, 6 },
+        };
+
         private static readonly Dictionary<string, int> komaName_to_kind =
             new Dictionary<string, int>()
         {
@@ -73,27 +105,20 @@ namespace PvP993
                 {"馬", 14 },
                 {"竜", 15 },
         };
-        private static readonly Dictionary<Kind, int> kind_to_piece = //PutKomaでkindを目的のpiecesに変換するためのdictionary
-            new Dictionary<Kind, int>()
-        {
-                {Kind.Fu, 0 },
-                {Kind.Kyo, 3 },
-                {Kind.Kei, 6 },
-                {Kind.Gin, 9 },
-                {Kind.Kin, 12 },
-                {Kind.Kak, 15 },
-                {Kind.Hi, 18 },
-                {Kind.Ou, 21 },
-                {Kind.Gyo, 24 },
-        };
-        private Color[] komaColor = new Color[]
-        {
-            new Color(238, 130, 238),
-            new Color(255, 0, 0),
-            new Color(255, 182, 193),
-        };
 
-        public GameObject[] pieces = new GameObject[9*3];
+        private static readonly Dictionary<string, string> nari =
+            new Dictionary<string, string>()
+        {
+                {"歩", "と" },
+                {"香\n車", "成\n香" },
+                {"桂\n馬", "成\n桂" },
+                {"銀\n将", "成\n銀" },
+                {"金\n将", "金\n将" },
+                {"角\n行", "馬" },
+                {"飛\n車", "竜" },
+                {"王\n将", "王\n将" },
+                {"玉\n将", "玉\n将" },
+        };
 
 
         private void Start()
@@ -101,7 +126,36 @@ namespace PvP993
 
         }
 
-        public void PutKoma(int o, Kind kind, int x, int y, int z, GameObject[,,] koma3D, GameObject[,,] koma2D) //owner, 駒の種類, x, y, z, 拡大縮小
+        public void InitialSet()
+        {
+            for (int x = 0; x < xLength; x++)
+            {
+                PutKoma(1, Kind.Fu, x, 0, 2);
+                PutKoma(-1, Kind.Fu, x, 2, zLength - 3);
+            }
+            //銀桂香の配置
+            for (int x = 0; x <= 2; x++)
+            {
+                Kind k = (Kind)Enum.ToObject(typeof(Kind), x + 2);
+                PutKoma(1, k, x, 0, 0);
+                PutKoma(1, k, 8 - x, 0, 0);
+                PutKoma(-1, k, x, 2, 8);
+                PutKoma(-1, k, 8 - x, 2, 8);
+            }
+            //その他の駒の配置
+            PutKoma(1, Kind.Kin, 3, 0, 0);
+            PutKoma(1, Kind.Kin, 5, 0, 0);
+            PutKoma(-1,Kind.Kin, 3, 2, 8);
+            PutKoma(-1,Kind.Kin, 5, 2, 8);
+            PutKoma(1, Kind.Ou, 4, 0, 0);
+            PutKoma(-1,Kind.Gyo, 4, 2, 8);
+            PutKoma(1, Kind.Kak, 1, 0, 1);
+            PutKoma(-1,Kind.Kak, 7, 2, 7);
+            PutKoma(1, Kind.Hi, 7, 0, 1);
+            PutKoma(-1,Kind.Hi, 1, 2, 7);
+        }
+
+        public void PutKoma(int o, Kind kind, int x, int y, int z) //owner, 駒の種類, x, y, z, 拡大縮小
         {
             int k = kind_to_piece[kind]; //kindにあたる駒のpiecesにおける添え字番号を計算
             koma3D[x, y, z] = Instantiate(pieces[k], this.transform);
@@ -116,7 +170,7 @@ namespace PvP993
             koma2D[x, y, z].SetActive(false);
 
             koma2D[x, y, z].transform.localScale = new Vector3(komaScale2D, komaScale2D, komaScale2D);
-
+            boardstate[x, y, z] = (int)kind * o;
         }
 
         public int Nari(GameObject koma)
@@ -124,11 +178,18 @@ namespace PvP993
             int x = (int)koma.transform.position.x, y = (int)(koma.transform.position.y + 0.5f), z = (int)koma.transform.position.z; 
             Text targetText = koma.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
             string kind = targetText.text;
+
+            //もし成るならtargetTextを書き換える
+            bool nari_flag = true;
             targetText.text = nari[kind];
-            return komaName_to_kind[nari[kind]];
+
+            return nari_flag ? komaName_to_kind[nari[kind]] : komaName_to_kind[kind];
         }
 
 
         public float KomaScale2D { set { this.komaScale2D = value; } }
+        public GameObject[,,] Koma3D { set { this.koma3D = value; } }
+        public GameObject[,,] Koma2D { set { this.koma2D = value; } }
+        public int[,,] Boardstate { set { this.boardstate = value; } }
     }
 }
