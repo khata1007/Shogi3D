@@ -14,10 +14,13 @@ namespace PvP993
         private GameObject[,,] koma3D;
         private GameObject[,,] koma2D;
         private int[,,] boardstate;
-        public GameObject[] pieces = new GameObject[9 * 3];
+        public GameObject[] pieces = new GameObject[28];
+        public GameObject[] pieces2D = new GameObject[10];
         public enum Kind { Emp, Fu, Kyo, Kei, Gin, Kak, Hi, Kin, Ou, Gyo, To, NariKyo, NariKei, NariGin, Uma, Ryu};
 
         //-----------------------駒の設計図-----------------------//
+        //備考: sunpou と deg は ナンバリングが fu, kyo, kei, gin, kin, kak, hi, ou, gyo になっているので Kind との混同に注意
+        //      本当は直すべきだけど sunpou と deg に触れるのは prefab 生成時だけなのでこのまま放置
         private const float k = 0.9f / 31; //王将のz軸方向が0.90fになるようにする
         public static readonly float[,] sunpou =
         {
@@ -48,22 +51,22 @@ namespace PvP993
         private static readonly Dictionary<Kind, int> kind_to_piece = //PutKomaでkindを目的のpiecesに変換するためのdictionary
             new Dictionary<Kind, int>()
         {
-                {Kind.Fu, 0 },
-                {Kind.Kyo, 3 },
-                {Kind.Kei, 6 },
-                {Kind.Gin, 9 },
-                {Kind.Kin, 12 },
-                {Kind.Kak, 15 },
-                {Kind.Hi, 18 },
-                {Kind.Ou, 21 },
-                {Kind.Gyo, 24 },
+                {Kind.Fu, 1 },
+                {Kind.Kyo,2 },
+                {Kind.Kei, 3 },
+                {Kind.Gin, 4 },
+                {Kind.Kin, 7 },
+                {Kind.Kak, 5 },
+                {Kind.Hi, 6 },
+                {Kind.Ou, 8 },
+                {Kind.Gyo, 9 },
         };
 
         private Color[] komaColor = new Color[]
         {
-            new Color(238, 130, 238),
+            new Color(0, 0, 0),
             new Color(255, 0, 0),
-            new Color(255, 182, 193),
+            new Color(0, 0, 0),
         };
 
         private static readonly Dictionary<int, int> komaGet =
@@ -85,6 +88,8 @@ namespace PvP993
                 {14, -5 }, {-14, 5 },
                 {15, -6 }, {-15, 6 },
         };
+
+        private static List<Vector3Int>[] komaMove;
 
         private static readonly Dictionary<string, int> komaName_to_kind =
             new Dictionary<string, int>()
@@ -123,7 +128,11 @@ namespace PvP993
 
         private void Start()
         {
-
+            komaMove = new List<Vector3Int>[16];
+            for (int i = 0; i < 16; i++) komaMove[i] = new List<Vector3Int>();
+            komaMove[1].Add(new Vector3Int(0, 1, 0));
+            komaMove[1].Add(new Vector3Int(0, -1, 0));
+            komaMove[1].Add(new Vector3Int(0, 0, 1));
         }
 
         public void InitialSet()
@@ -163,7 +172,7 @@ namespace PvP993
             if (o == -1) koma3D[x, y, z].transform.eulerAngles = new Vector3(0, 180, 0);
             koma3D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
 
-            koma2D[x, y, z] = Instantiate(pieces[k], this.transform);
+            koma2D[x, y, z] = Instantiate(pieces2D[k], this.transform);
             koma2D[x, y, z].transform.position = new Vector3(x * komaScale2D - (y - 1) * 10 * komaScale2D, 0, z * komaScale2D);
             if (o == -1) koma2D[x, y, z].transform.eulerAngles = new Vector3(0, 180, 0);
             koma2D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
@@ -187,6 +196,7 @@ namespace PvP993
         }
 
 
+        public static List<Vector3Int> getKomaMove(int k) { return komaMove[k]; }
         public float KomaScale2D { set { this.komaScale2D = value; } }
         public GameObject[,,] Koma3D { set { this.koma3D = value; } }
         public GameObject[,,] Koma2D { set { this.koma2D = value; } }

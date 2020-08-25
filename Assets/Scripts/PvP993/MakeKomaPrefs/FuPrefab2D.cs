@@ -7,7 +7,7 @@ namespace MakeKomaPrefs
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(MeshFilter))]
 
-    public class FuPrefab : MonoBehaviour
+    public class FuPrefab2D : MonoBehaviour
     {
         [SerializeField] private Material _mat;
 
@@ -31,19 +31,20 @@ namespace MakeKomaPrefs
             
             Vector3[] positions = new Vector3[]
             {
-                new Vector3(0f, h, 0f),
-                new Vector3(0f, h-id, 0.5f*b),
-                new Vector3(a*Mathf.Sin(P/2), h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma), 0.5f*b-a*Mathf.Cos(P/2)),
-                new Vector3(c/2, h+id, -0.5f*b),
-                new Vector3(-c/2, h+id, -0.5f*b),
-                new Vector3(-a*Mathf.Sin(P/2), h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma), 0.5f*b-a*Mathf.Cos(P/2)),
-
+                new Vector3(0f, 0, 0f),
+                new Vector3(0f, 0, 0.5f*b),
+                new Vector3(a*Mathf.Sin(P/2), 0, 0.5f*b-a*Mathf.Cos(P/2)),
+                new Vector3(c/2, 0, -0.5f*b),
+                new Vector3(-c/2, 0, -0.5f*b),
+                new Vector3(-a*Mathf.Sin(P/2), 0, 0.5f*b-a*Mathf.Cos(P/2)),
+                /*
                 new Vector3(0f, -h, 0f),
                 new Vector3(0f, -(h-id), 0.5f*b),
                 new Vector3(a*Mathf.Sin(P/2), -(h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma)), 0.5f*b-a*Mathf.Cos(P/2)),
                 new Vector3(c/2, -(h+id), -0.5f*b),
                 new Vector3(-c/2, -(h+id), -0.5f*b),
                 new Vector3(-a*Mathf.Sin(P/2), -(h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma)), 0.5f*b-a*Mathf.Cos(P/2)),
+                */
             };
             /*
             float eps = 0.01f;
@@ -72,7 +73,7 @@ namespace MakeKomaPrefs
                 positions[ 0],positions[ 3],positions[ 4],
                 positions[ 0],positions[ 4],positions[ 5],
                 positions[ 0],positions[ 5],positions[ 1],
-
+                /*
                 //底板
                 positions[ 6],positions[ 8],positions[ 7],
                 positions[ 6],positions[ 9],positions[ 8],
@@ -95,6 +96,7 @@ namespace MakeKomaPrefs
 
                 positions[ 1],positions[ 5],positions[11],
                 positions[ 1],positions[11],positions[ 7],
+                */
             };
 
             int[] triangles0 = new int[mesh.vertices.Length]; //駒の表面全体にマテリアルを設定

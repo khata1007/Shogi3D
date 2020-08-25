@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PvP993
 {
@@ -29,10 +30,40 @@ namespace PvP993
 
         public GameObject orangeBoardPrefab2D;
         public GameObject greenBoardPrefab2D;
+
+        public GameObject gridButtonPrefab;
+        public GameObject debugButtonPrefab;
+
+        public Game game;
         // Start is called before the first frame update
         void Start()
         {
-            
+            Transform list = this.transform.GetChild(6).transform;
+            for (int y = 0; y < yLength; y++)
+            {
+                float offset = (1 - y) * 10 * boardScale2D;
+                for (int z = 0; z < zLength; z++)
+                {
+                    for(int x = 0; x < xLength; x++)
+                    {
+                        //プレハブからボタンを生成
+                        GameObject listButton = Instantiate(gridButtonPrefab) as GameObject;
+                        //Vertical Layout Group の子にする
+                        listButton.transform.SetParent(list, false);
+
+                        //position 設定
+                        listButton.transform.position = new Vector3(x * boardScale2D + offset, 0, z * boardScale2D);
+
+                        //以下、追加---------
+                        int n = x * 100 + y * 10 + z;
+                        //引数に何番目のボタンかを渡す
+                        Button b = listButton.GetComponent<Button>();
+                        b.onClick.AddListener(() => game.ChooseGrid(n));
+                        b.enabled = false; //初期状態はfalse
+                        game.SetGridButton2D(b, x, y, z);
+                    }
+                }
+            }
         }
 
         public void CreateBoard(GameObject[,,] ob3D, GameObject[,,] gb3D, GameObject[,,] ob2D, GameObject[,,] gb2D)
@@ -119,7 +150,7 @@ namespace PvP993
                 for(int z = 0; z <= zLength; z++)
                 {
                     fx2D[y, z] = Instantiate(framePrefab, frameXTransform);
-                    fx2D[y, z].GetComponent<Renderer>().material.color = frameColor[y];
+                    fx2D[y, z].GetComponent<Renderer>().material.color = frameColor[2];
                     fx2D[y, z].transform.position = new Vector3(xCenter + offset, 0, z * boardScale2D - boardScale2D/2);
                     fx2D[y, z].SetActive(false);
                 }
@@ -132,7 +163,7 @@ namespace PvP993
                 for (int x = 0; x <= xLength; x++)
                 {
                     fz2D[y, x] = Instantiate(framePrefab, frameZTransform);
-                    fz2D[y, x].GetComponent<Renderer>().material.color = frameColor[y];
+                    fz2D[y, x].GetComponent<Renderer>().material.color = frameColor[2];
                     fz2D[y, x].transform.position = new Vector3(x * boardScale2D - boardScale2D/2 + offset, 0, zCenter);
                     fz2D[y, x].SetActive(false);
                 }
