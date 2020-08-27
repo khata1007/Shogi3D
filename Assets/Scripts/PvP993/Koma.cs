@@ -161,7 +161,35 @@ namespace PvP993
             komaMove[4].Add(new Vector3Int(1, -1, 0));
 
             //角
+            for(int dy = -2, dz = -2; dy <= 2; dy++, dz++)
+            {
+                if(dy != 0) komaMove[5].Add(new Vector3Int(0, dy, dz));
+            }
+            for (int dy = -2, dx = -2; dy <= 2; dy++, dx++)
+            {
+                if(dy != 0) komaMove[5].Add(new Vector3Int(dx, dy, 0));
+            }
+            for(int dx = -8, dz = -8; dx <= 8; dx++, dz++)
+            {
+                if(dx != 0) komaMove[5].Add(new Vector3Int(dx, 0, dz));
+            }
+            for(int dx = -8, dz = 8; dx <= 8; dx++, dz--)
+            {
+                if(dx != 0) komaMove[5].Add(new Vector3Int(dx, 0, dz));
+            }
             //飛
+            for(int dy = -2; dy <= 2; dy++)
+            {
+                if (dy != 0) komaMove[6].Add(new Vector3Int(0, dy, 0));
+            }
+            for(int dx = -8; dx <= 8; dx++)
+            {
+                if (dx != 0) komaMove[6].Add(new Vector3Int(dx, 0, 0));
+            }
+            for(int dz = -8; dz <= 8; dz++)
+            {
+                if (dz != 0) komaMove[6].Add(new Vector3Int(0, 0, dz));
+            }
             //金
             komaMove[7].Add(new Vector3Int(1, 0, 1));
             komaMove[7].Add(new Vector3Int(-1, 0, 1));
@@ -173,8 +201,20 @@ namespace PvP993
             komaMove[7].Add(new Vector3Int(0, 1, 1));
             komaMove[7].Add(new Vector3Int(0, -1, 0));
             komaMove[7].Add(new Vector3Int(0, -1, 1));
-            //王
-            //玉
+
+            //王,玉
+            for(int dx = -1; dx <= 1; dx++)
+            {
+                for(int dy = -1; dy <= 1; dy++)
+                {
+                    for(int dz = -1; dz <= 1; dz++)
+                    {
+                        if (dx == 0 && dy == 0 && dz == 0) continue;
+                        komaMove[8].Add(new Vector3Int(dx, dy, dz));
+                        komaMove[9].Add(new Vector3Int(dx, dy, dz));
+                    }
+                }
+            }
             //成香
             //成桂
             //成銀

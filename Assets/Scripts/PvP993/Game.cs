@@ -100,7 +100,7 @@ namespace PvP993
 
             koma.InitialSet(); //初期配置
 
-            boardstate[0, 0, 0] = koma.Nari(koma_on_board3D[0, 0, 0]);
+            //boardstate[0, 0, 0] = koma.Nari(koma_on_board3D[0, 0, 0]);
         }
 
         // Update is called once per frame
