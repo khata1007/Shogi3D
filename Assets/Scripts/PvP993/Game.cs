@@ -22,7 +22,7 @@ namespace PvP993
         public Board board;
         public CameraMover camera;
 
-        //3Dの箱とフレーム、2Dの箱とフレーム
+        //3Dの箱とフレーム、2Dの箱とフレーム、移動可能場所の赤い円
         private GameObject[,,] orangeBox3D;
         private GameObject[,,] greenBox3D;
 
@@ -35,11 +35,15 @@ namespace PvP993
         private GameObject[,] frameX2D;
         private GameObject[,] frameZ2D;
 
+        private GameObject[,,] movableGrid3D;
+        private GameObject[,,] movableGrid2D;
+
         //盤上の駒
         private GameObject[,,] koma_on_board3D; //実際の駒への参照配列
         private GameObject[,,] koma_on_board2D;
         private int[,,] boardstate;
         private Button[,,] gridButton2D;
+        private Button chooseResetButton2D;
         
 
         private void Awake()
@@ -66,6 +70,9 @@ namespace PvP993
 
             koma_on_board3D = new GameObject[xLength, yLength, zLength];
             koma_on_board2D = new GameObject[xLength, yLength, zLength];
+
+            movableGrid3D = new GameObject[xLength, yLength, zLength];
+            movableGrid2D = new GameObject[xLength, yLength, zLength];
             boardstate = new int[xLength, yLength, zLength];
 
             
@@ -74,7 +81,7 @@ namespace PvP993
             koma.Koma3D = koma_on_board3D;
             koma.Koma2D = koma_on_board2D;
 
-            board.CreateBoard(orangeBox3D, greenBox3D, orangeBox2D, greenBox2D);
+            board.CreateBoard(orangeBox3D, greenBox3D, orangeBox2D, greenBox2D, movableGrid3D, movableGrid2D);
             board.CreateFrame(frameX3D, frameZ3D, frameX2D, frameZ2D);
 
             //koma_on_Board3D/2Dをnullで初期化
@@ -111,11 +118,6 @@ namespace PvP993
                 {
                     for(int z = 0; z < zLength; z++)
                     {
-                        //orangeBox3D[x, y, z].SetActive(!orangeBox3D[x, y, z].activeSelf);
-                        //orangeBox2D[x, y, z].SetActive(!orangeBox2D[x, y, z].activeSelf);
-                        //greenBox3D[x, y, z].SetActive(!greenBox3D[x, y, z].activeSelf);
-                        //greenBox2D[x, y, z].SetActive(!greenBox2D[x, y, z].activeSelf);
-
                         if (koma_on_board3D[x, y, z] != null) koma_on_board3D[x, y, z].SetActive(!koma_on_board3D[x, y, z].activeSelf);
                         if (koma_on_board2D[x, y, z] != null) koma_on_board2D[x, y, z].SetActive(!koma_on_board2D[x, y, z].activeSelf);
                     }
@@ -168,17 +170,17 @@ namespace PvP993
                             orangeBox3D[x, y, z].SetActive(true);
                         }
 
-                        active3D = greenBox3D[x, y, z].activeSelf;
-                        active2D = greenBox2D[x, y, z].activeSelf;
+                        active3D = movableGrid3D[x, y, z].activeSelf;
+                        active2D = movableGrid2D[x, y, z].activeSelf;
                         if (active3D & !active2D)
                         {
-                            greenBox2D[x, y, z].SetActive(true);
-                            greenBox3D[x, y, z].SetActive(false);
+                            movableGrid2D[x, y, z].SetActive(true);
+                            movableGrid3D[x, y, z].SetActive(false);
                         }
                         else if (!active3D & active2D)
                         {
-                            greenBox2D[x, y, z].SetActive(false);
-                            greenBox3D[x, y, z].SetActive(true);
+                            movableGrid2D[x, y, z].SetActive(false);
+                            movableGrid3D[x, y, z].SetActive(true);
                         }
                     }
                 }
@@ -202,35 +204,102 @@ namespace PvP993
             return (0 <= x && x < xLength) && (0 <= y && y < yLength) && (0 <= z && z < zLength);
         }
 
-        public void ChooseGrid(int idx)
+        private bool CheckMovable(int gx, int gy, int gz, int sx, int sy, int sz, bool keima = false)
         {
-            int nowz = idx % 10;
-            int nowy = (idx / 10) % 10;
-            int nowx = (idx / 100) % 10;
-            //選択マスの orangeBoard による色付け
+            if (!keima)
+            {
+                int max = Math.Max(Math.Abs(gx - sx), Math.Max(Math.Abs(gy - sy), Math.Abs(gz - sz)));
+                int dx = (gx - sx) / max, dy = (gy - sy) / max, dz = (gz - sz) / max;
+                int posx = sx + dx, posy = sy + dy, posz = sz + dz;
+                while (posx != gx || posy != gy || posz != gz)
+                {
+                    if (boardstate[posx, posy, posz] != 0) return false;
+                    posx += dx; posy += dy; posz += dz;
+                }
+            }
+            //ここまでで「駒が重なってもok」とした. 
+            return boardstate[sx, sy, sz] * boardstate[gx, gy, gz] <= 0; //自分の駒と重なるのはNG
+        }
+
+        private void UnActivateChoosingGrid()
+        {
             for(int x = 0; x < xLength; x++)
             {
                 for(int y = 0; y < yLength; y++)
                 {
                     for(int z = 0; z < zLength; z++)
                     {
+                        //greenBox3D[x, y, z].SetActive(false);
+                        //greenBox2D[x, y, z].SetActive(false);
+                        movableGrid3D[x, y, z].SetActive(false);
+                        movableGrid2D[x, y, z].SetActive(false);
+                        orangeBox3D[x, y, z].SetActive(false);
                         orangeBox2D[x, y, z].SetActive(false);
-                        greenBox2D[x, y, z].SetActive(false);
                     }
                 }
             }
-            if (boardstate[nowx, nowy, nowz] != 0) orangeBox2D[nowx, nowy, nowz].SetActive(true);
+        }
 
-            //移動可能マスの greenBox による色付け
-            List<Vector3Int> move = Koma.getKomaMove(boardstate[nowx, nowy, nowz]);
-            foreach(Vector3Int vec in move)
+        public void ChooseGrid(int idx)
+        {
+            int pushz = idx % 10;
+            int pushy = (idx / 10) % 10;
+            int pushx = (idx / 100) % 10;
+            //選択マスが移動可能マス（赤丸の表示されているマス）の場合は駒を移動させる
+            if (movableGrid2D[pushx, pushy, pushz].activeSelf)
             {
-                int next_x = nowx + vec.x, next_y = nowy + vec.y, next_z = nowz + vec.z;
-                if (CheckBound(next_x, next_y, next_z)) greenBox2D[next_x, next_y, next_z].SetActive(true);
+                int fromx = -1, fromy = -1, fromz = -1;
+                for(int x = 0; x < xLength; x++)
+                {
+                    for(int y = 0; y < yLength; y++)
+                    {
+                        for(int z = 0; z < zLength; z++)
+                        {
+                            if(orangeBox2D[x, y, z].activeSelf) { fromx = x; fromy = y; fromz = z; }
+                        }
+                    }
+                }
+                if (fromx == -1 || fromy == -1 || fromz == -1) Debug.Log("gridChooseError");
+                else
+                {
+                    int dx = pushx - fromx, dy = pushy - fromy, dz = pushz - fromz;
+                    koma_on_board3D[fromx, fromy, fromz].transform.position += new Vector3(dx, dy, dz);
+                    koma_on_board2D[fromx, fromy, fromz].transform.position += new Vector3(dx * scale2D - (dy * 10) * scale2D, 0, dz * scale2D);
+
+                    koma_on_board3D[pushx, pushy, pushz] = koma_on_board3D[fromx, fromy, fromz];
+                    koma_on_board3D[fromx, fromy, fromz] = null;
+                    koma_on_board2D[pushx, pushy, pushz] = koma_on_board2D[fromx, fromy, fromz];
+                    koma_on_board2D[fromx, fromy, fromz] = null;
+                    
+                    boardstate[pushx, pushy, pushz] = boardstate[fromx, fromy, fromz];
+                    boardstate[fromx, fromy, fromz] = 0;
+                    UnActivateChoosingGrid();
+                }
+            }
+            else
+            {
+                //選択マスの orangeBoard による色付け 軌道上の駒を無視したら最大Nマス移動可能として計算量O(N^2) (必要に応じて改善)
+                UnActivateChoosingGrid();
+                if (boardstate[pushx, pushy, pushz] != 0) orangeBox2D[pushx, pushy, pushz].SetActive(true);
+
+                //移動可能マスの movableGrid による色付け
+                List<Vector3Int> move = Koma.getKomaMove(boardstate[pushx, pushy, pushz]);
+                foreach (Vector3Int vec in move)
+                {
+                    int next_x = pushx + vec.x, next_y = pushy + vec.y, next_z = pushz + vec.z;
+                    
+                    if(CheckBound(next_x, next_y, next_z))
+                    {
+                        if ((boardstate[pushx, pushy, pushz] == 3 && CheckMovable(next_x, next_y, next_z, pushx, pushy, pushz, true)) ||
+                            boardstate[pushx, pushy, pushz] != 3 && CheckMovable(next_x, next_y, next_z, pushx, pushy, pushz))
+                            movableGrid2D[next_x, next_y, next_z].SetActive(true);
+                    }
+                }
             }
         }
 
         public void SetGridButton2D(Button b, int x, int y, int z) { gridButton2D[x, y, z] = b; }
+        public Button ChooseResetButton2D { set { chooseResetButton2D = value; } }
         public bool MouseDetectable { get { return mouseDetectable; } set { mouseDetectable = value; } }
     }
 }

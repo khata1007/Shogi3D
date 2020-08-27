@@ -34,6 +34,9 @@ namespace PvP993
         public GameObject gridButtonPrefab;
         public GameObject debugButtonPrefab;
 
+        public GameObject movableGridPrefab3D;
+        public GameObject movableGridPrefab2D;
+
         public Game game;
         // Start is called before the first frame update
         void Start()
@@ -64,12 +67,15 @@ namespace PvP993
                     }
                 }
             }
+            //MeshRenderer mr = this.transform.GetChild(7).gameObject.transform.GetComponent<MeshRenderer>();
+            //mr.material.color = new Color(0, 0, 0, 0.0f);
         }
 
-        public void CreateBoard(GameObject[,,] ob3D, GameObject[,,] gb3D, GameObject[,,] ob2D, GameObject[,,] gb2D)
+        public void CreateBoard(GameObject[,,] ob3D, GameObject[,,] gb3D, GameObject[,,] ob2D, GameObject[,,] gb2D, GameObject[,,] mg3D, GameObject[,,] mg2D)
         {
             Transform orangeBoardTransform3D = this.transform.GetChild(0).gameObject.transform;
             Transform greenBoardTransform3D = this.transform.GetChild(1).gameObject.transform;
+            Transform movableGridTransform3D = this.transform.GetChild(7).gameObject.transform;
             for(int y = 0; y < yLength; y++)
             {
                 for (int z = 0; z < zLength; z++)
@@ -77,19 +83,25 @@ namespace PvP993
                     for(int x = 0; x < xLength; x++)
                     {
                         ob3D[x, y, z] = Instantiate(orangeBoardPrefab3D, orangeBoardTransform3D);
-                        ob3D[x, y, z].transform.position = new Vector3(x, y-0.5f, z);
+                        ob3D[x, y, z].transform.position = new Vector3(x, y - 0.5f, z);
                         ob3D[x, y, z].SetActive(false);
                         gb3D[x, y, z] = Instantiate(greenBoardPrefab3D, greenBoardTransform3D);
-                        gb3D[x, y, z].transform.position = new Vector3(x, y-0.5f, z);
+                        gb3D[x, y, z].transform.position = new Vector3(x, y - 0.5f, z);
                         gb3D[x, y, z].SetActive(false);
+                        mg3D[x, y, z] = Instantiate(movableGridPrefab3D, movableGridTransform3D);
+                        mg3D[x, y, z].transform.position = new Vector3(x, y - 0.5f, z);
+                        mg3D[x, y, z].SetActive(false);
+
                     }
                 }
             }
 
             Transform orangeBoardTransform2D = this.transform.GetChild(2).gameObject.transform;
             Transform greenBoardTransform2D = this.transform.GetChild(3).gameObject.transform;
+            Transform movableGridTransform2D = this.transform.GetChild(8).gameObject.transform;
             orangeBoardTransform2D.localScale = new Vector3(boardScale2D, 0.01f, boardScale2D);
             greenBoardTransform2D.localScale = new Vector3(boardScale2D, 0.01f, boardScale2D);
+            movableGridTransform2D.localScale = new Vector3(boardScale2D, 0.01f, boardScale2D);
             for (int y = 0; y < yLength; y++)
             {
                 float offset = (1 - y) * 10 * boardScale2D;
@@ -103,6 +115,9 @@ namespace PvP993
                         gb2D[x, y, z] = Instantiate(greenBoardPrefab2D, greenBoardTransform2D);
                         gb2D[x, y, z].transform.position = new Vector3(x * boardScale2D + offset, 0, z * boardScale2D);
                         gb2D[x, y, z].SetActive(false);
+                        mg2D[x, y, z] = Instantiate(movableGridPrefab2D, movableGridTransform2D);
+                        mg2D[x, y, z].transform.position = new Vector3(x * boardScale2D + offset, 0, z * boardScale2D);
+                        mg2D[x, y, z].SetActive(false);
                     }
                 }
             }

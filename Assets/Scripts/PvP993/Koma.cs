@@ -130,9 +130,56 @@ namespace PvP993
         {
             komaMove = new List<Vector3Int>[16];
             for (int i = 0; i < 16; i++) komaMove[i] = new List<Vector3Int>();
+            //歩の動き
             komaMove[1].Add(new Vector3Int(0, 1, 0));
             komaMove[1].Add(new Vector3Int(0, -1, 0));
             komaMove[1].Add(new Vector3Int(0, 0, 1));
+
+            //香の動き
+            for(int dy = -2; dy <= 2; dy++)
+            {
+                if(dy != 0) komaMove[2].Add(new Vector3Int(0, dy, 0));
+            }
+            for(int dz = 1; dz <= 8; dz++)
+            {
+                komaMove[2].Add(new Vector3Int(0, 0, dz));
+            }
+
+            //桂の動き
+            komaMove[3].Add(new Vector3Int(1, 0, 2));
+            komaMove[3].Add(new Vector3Int(-1, 0, 2));
+            komaMove[3].Add(new Vector3Int(0, 1, 2));
+            komaMove[3].Add(new Vector3Int(0, -1, 2));
+
+            //銀
+            komaMove[4].Add(new Vector3Int(1, 0, 1));
+            komaMove[4].Add(new Vector3Int(-1, 0, 1));
+            komaMove[4].Add(new Vector3Int(0, 0, 1));
+            komaMove[4].Add(new Vector3Int(1, 0, -1));
+            komaMove[4].Add(new Vector3Int(-1, 0, -1));
+            komaMove[4].Add(new Vector3Int(1, 1, 0));
+            komaMove[4].Add(new Vector3Int(1, -1, 0));
+
+            //角
+            //飛
+            //金
+            komaMove[7].Add(new Vector3Int(1, 0, 1));
+            komaMove[7].Add(new Vector3Int(-1, 0, 1));
+            komaMove[7].Add(new Vector3Int(0, 0, 1));
+            komaMove[7].Add(new Vector3Int(1, 0, 0));
+            komaMove[7].Add(new Vector3Int(0, 0, -1));
+            komaMove[7].Add(new Vector3Int(-1, 0, 0));
+            komaMove[7].Add(new Vector3Int(0, 1, 0));
+            komaMove[7].Add(new Vector3Int(0, 1, 1));
+            komaMove[7].Add(new Vector3Int(0, -1, 0));
+            komaMove[7].Add(new Vector3Int(0, -1, 1));
+            //王
+            //玉
+            //成香
+            //成桂
+            //成銀
+            //馬
+            //竜
         }
 
         public void InitialSet()
