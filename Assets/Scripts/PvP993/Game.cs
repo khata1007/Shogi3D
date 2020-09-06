@@ -346,8 +346,8 @@ namespace PvP993
                     if (turn == 1) for (int i = 0; i < myMochigomaBox.Count; i++) { if (myMochigomaBox[i].activeSelf) choose = i; }
                     else for (int i = 0; i < opMochigomaBox.Count; i++) { if (opMochigomaBox[i].activeSelf) choose = i; }
                     Debug.Log(choose);
-                    Debug.Log(myMochigomaIdx[choose]);
-                    koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(myMochigomaIdx[choose])), pushx, pushy, pushz);
+                    if (turn == 1) koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(myMochigomaIdx[choose])), pushx, pushy, pushz);
+                    else koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(opMochigomaIdx[choose])), pushx, pushy, pushz);
                     koma_on_board2D[pushx, pushy, pushz].SetActive(true);
                     koma_on_board3D[pushx, pushy, pushz].SetActive(false); //PutKomaは標準で3Dを有効にするので
                     MochigomaRemove(choose);
@@ -565,6 +565,7 @@ namespace PvP993
                         opMochigomaBox[i] = bx;
                     }
                 }
+                for(int i = 0; i < opMochigomaIdx.Count; i++) { Debug.Log(opMochigomaIdx[i]); }
             }
         }
 
