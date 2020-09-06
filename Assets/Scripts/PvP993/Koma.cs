@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 namespace PvP993
 {
@@ -14,6 +15,7 @@ namespace PvP993
         private GameObject[,,] koma3D;
         private GameObject[,,] koma2D;
         private int[,,] boardstate;
+        private static int nariflg = 0;
         public GameObject[] pieces = new GameObject[28];
         public GameObject[] pieces2D = new GameObject[10];
         public enum Kind { Emp, Fu, Kyo, Kei, Gin, Kak, Hi, Kin, Ou, Gyo, To, NariKyo, NariKei, NariGin, Uma, Ryu};
@@ -152,13 +154,13 @@ namespace PvP993
             komaMove[3].Add(new Vector3Int(0, -1, 2));
 
             //銀
-            komaMove[4].Add(new Vector3Int(1, 0, 1));
-            komaMove[4].Add(new Vector3Int(-1, 0, 1));
-            komaMove[4].Add(new Vector3Int(0, 0, 1));
-            komaMove[4].Add(new Vector3Int(1, 0, -1));
-            komaMove[4].Add(new Vector3Int(-1, 0, -1));
-            komaMove[4].Add(new Vector3Int(1, 1, 0));
-            komaMove[4].Add(new Vector3Int(1, -1, 0));
+            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(1, dy, 1));
+            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(-1, dy, 1));
+            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(0, dy, 1));
+            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(1, dy, -1));
+            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(-1, dy, -1));
+            //komaMove[4].Add(new Vector3Int(1, 1, 0));
+            //komaMove[4].Add(new Vector3Int(1, -1, 0));
 
             //角
             for(int dy = -2, dz = -2; dy <= 2; dy++, dz++)
@@ -191,16 +193,16 @@ namespace PvP993
                 if (dz != 0) komaMove[6].Add(new Vector3Int(0, 0, dz));
             }
             //金
-            komaMove[7].Add(new Vector3Int(1, 0, 1));
-            komaMove[7].Add(new Vector3Int(-1, 0, 1));
-            komaMove[7].Add(new Vector3Int(0, 0, 1));
-            komaMove[7].Add(new Vector3Int(1, 0, 0));
-            komaMove[7].Add(new Vector3Int(0, 0, -1));
-            komaMove[7].Add(new Vector3Int(-1, 0, 0));
-            komaMove[7].Add(new Vector3Int(0, 1, 0));
-            komaMove[7].Add(new Vector3Int(0, 1, 1));
-            komaMove[7].Add(new Vector3Int(0, -1, 0));
-            komaMove[7].Add(new Vector3Int(0, -1, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(1, dy, 0));
+            for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(0, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(-1, dy, 0));
+            //komaMove[7].Add(new Vector3Int(0, 1, 0));
+            //komaMove[7].Add(new Vector3Int(0, 1, 1));
+            //komaMove[7].Add(new Vector3Int(0, -1, 0));
+            //komaMove[7].Add(new Vector3Int(0, -1, 1));
 
             //王,玉
             for(int dx = -1; dx <= 1; dx++)
@@ -215,11 +217,59 @@ namespace PvP993
                     }
                 }
             }
+            //と
+            for (int dy = -1; dy <= 1; dy++) komaMove[10].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[10].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[10].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[10].Add(new Vector3Int(1, dy, 0));
+            for (int dy = -1; dy <= 1; dy++) komaMove[10].Add(new Vector3Int(0, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[10].Add(new Vector3Int(-1, dy, 0));
             //成香
+            for (int dy = -1; dy <= 1; dy++) komaMove[11].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[11].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[11].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[11].Add(new Vector3Int(1, dy, 0));
+            for (int dy = -1; dy <= 1; dy++) komaMove[11].Add(new Vector3Int(0, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[11].Add(new Vector3Int(-1, dy, 0));
             //成桂
+            for (int dy = -1; dy <= 1; dy++) komaMove[12].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[12].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[12].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[12].Add(new Vector3Int(1, dy, 0));
+            for (int dy = -1; dy <= 1; dy++) komaMove[12].Add(new Vector3Int(0, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[12].Add(new Vector3Int(-1, dy, 0));
             //成銀
+            for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(1, dy, 0));
+            for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(0, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(-1, dy, 0));
             //馬
+            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(1, dy, 0));
+            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(0, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(-1, dy, 0));
+            for (int i = 0; i < komaMove[5].Count; i++) komaMove[14].Add(komaMove[5][i]);
             //竜
+            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(1, dy, 0));
+            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(0, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(-1, dy, 0));
+            for (int i = 0; i < komaMove[6].Count; i++) komaMove[15].Add(komaMove[6][i]);
+        }
+
+        public async UniTask<bool> CheckNari()
+        {
+            int ret;
+            await UniTask.WaitWhile(() => nariflg == 0);
+            ret = nariflg;
+            nariflg = 0;
+            return ret == 1;
         }
 
         public void InitialSet()
@@ -269,24 +319,30 @@ namespace PvP993
             boardstate[x, y, z] = (int)kind * o;
         }
 
-        public int Nari(GameObject koma)
-        {
-            int x = (int)koma.transform.position.x, y = (int)(koma.transform.position.y + 0.5f), z = (int)koma.transform.position.z; 
-            Text targetText = koma.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
-            string kind = targetText.text;
+        public int Nari(GameObject koma3D, GameObject koma2D)
+        { 
+            Text targetText3D = koma3D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
 
-            //もし成るならtargetTextを書き換える
-            bool nari_flag = true;
-            targetText.text = nari[kind];
+            string kind = targetText3D.text;
+            targetText3D.text = nari[kind];
 
-            return nari_flag ? komaName_to_kind[nari[kind]] : komaName_to_kind[kind];
+            targetText3D = koma3D.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>();
+            targetText3D.text = nari[kind];
+
+            Text targetText2D = koma2D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
+            targetText2D.text = nari[kind];
+
+            return komaName_to_kind[nari[kind]]; //正値を返すので手番に応じて呼び出し元で-1倍してね
         }
 
-
+       
         public static List<Vector3Int> getKomaMove(int k) { return komaMove[k]; }
+        public GameObject GetKoma3D(int k) { return pieces[k]; }
+        public GameObject GetKoma2D(int k) { return pieces2D[k]; }
         public float KomaScale2D { set { this.komaScale2D = value; } }
         public GameObject[,,] Koma3D { set { this.koma3D = value; } }
         public GameObject[,,] Koma2D { set { this.koma2D = value; } }
         public int[,,] Boardstate { set { this.boardstate = value; } }
+        public static int Nariflg { set { if (value == 1 || value == -1) nariflg = value; } }
     }
 }

@@ -12,8 +12,11 @@ namespace PvP993
         private int yLength = Choose.InitialSetting.yLength;
         private int zLength = Choose.InitialSetting.zLength;
 
+        public Button cancelgridChooseButton;
         public Button changeDimensionButton;
         public Button gridChooseButton;
+        public Button reverseButton; //180°視点を反転
+        public Button nariYesButton, nariNoButton;
         public Game game;
         // Start is called before the first frame update
         void Start()
@@ -24,23 +27,39 @@ namespace PvP993
         // Update is called once per frame
         void Update()
         {
+            /*
             if (game.MouseDetectable)
             {
                 if (Input.GetMouseButtonUp(0)) Debug.Log("yeah");
             }
+            */
+        }
+
+        public void OnCancelGridChooseButtonClick()
+        {
+            Debug.Log("GridChooseButton Clicked");
+            game.UnActivateChoosingGrid();
         }
 
         public void OnDimensionButtonClick()
         {
-            game.ChangeDimension();
-            Text target = changeDimensionButton.transform.GetChild(0).GetComponent<Text>();
-            if (target.text[0] == '3') target.text = "2D";
-            else target.text = "3D";
+            if (game.MouseDetectable)
+            {
+                game.ChangeDimension();
+                Text target = changeDimensionButton.transform.GetChild(0).GetComponent<Text>();
+                if (target.text[0] == '3') target.text = "2D";
+                else target.text = "3D";
+            }
         }
 
-        public void OnGridChooseButtonClick()
+        public void OnNariButtonClick(int n)
         {
-            Debug.Log("buton clicked.");
+            Koma.Nariflg = n;
+        }
+
+        public void OnReverseButtonClick()
+        {
+            game.ReverseView();
         }
         
     }

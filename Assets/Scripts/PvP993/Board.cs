@@ -76,7 +76,10 @@ namespace PvP993
             Transform orangeBoardTransform3D = this.transform.GetChild(0).gameObject.transform;
             Transform greenBoardTransform3D = this.transform.GetChild(1).gameObject.transform;
             Transform movableGridTransform3D = this.transform.GetChild(7).gameObject.transform;
-            for(int y = 0; y < yLength; y++)
+            orangeBoardTransform3D.localScale = new Vector3(boardScale2D, 0.3f, boardScale2D);
+            greenBoardTransform3D.localScale = new Vector3(boardScale2D, 0.3f, boardScale2D);
+            movableGridTransform3D.localScale = new Vector3(boardScale2D, 0.3f, boardScale2D);
+            for (int y = 0; y < yLength; y++)
             {
                 for (int z = 0; z < zLength; z++)
                 {
