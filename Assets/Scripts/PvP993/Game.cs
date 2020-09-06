@@ -14,6 +14,7 @@ namespace PvP993
         private int zLength = Choose.InitialSetting.zLength;
 
         private Vector3 prevCameraPos;
+        private bool is3D = true;
 
         private bool mouseDetectable = true;
 
@@ -27,6 +28,11 @@ namespace PvP993
         public GameObject opponentMochigomaObj;
         public GameObject myMochigomaObj;
         public GameObject mochigomaButtonPrefab;
+        public GameObject mochigomaBoxPrefab;
+
+        public Camera mainCamera;
+        public Camera upperCamera;
+        public Camera underCamera;
 
 
         //3Dの箱とフレーム、2Dの箱とフレーム、移動可能場所の赤い円
@@ -56,9 +62,11 @@ namespace PvP993
         private List<GameObject> myMochigomaInstance;
         private List<int> myMochigomaIdx; //e.g. 持ち駒が歩と桂馬 -> {1, 3}
         private List<Button> myMochigomaButton;
+        private List<GameObject> myMochigomaBox;
         private List<GameObject> opMochigomaInstance;
         private List<int> opMochigomaIdx;
         private List<Button> opMochigomaButton;
+        private List<GameObject> opMochigomaBox;
 
         List<Vector3Int> record; //その対局の棋譜 
 
@@ -100,9 +108,11 @@ namespace PvP993
             myMochigomaInstance = new List<GameObject>(piecenum);
             myMochigomaIdx = new List<int>(piecenum);
             myMochigomaButton = new List<Button>(piecenum);
+            myMochigomaBox = new List<GameObject>(piecenum);
             opMochigomaInstance = new List<GameObject>(piecenum);
             opMochigomaIdx = new List<int>(piecenum);
             opMochigomaButton = new List<Button>(piecenum);
+            opMochigomaBox = new List<GameObject>(piecenum);
 
             record = new List<Vector3Int>();
 
@@ -140,29 +150,7 @@ namespace PvP993
             boardstate[0, 0, 0] = koma.Nari(koma_on_board3D[0, 0, 0]);
             Debug.Log(rule.getVal(0, 0, 0));
             */
-            Transform opMochigomaInstTransform = opponentMochigomaObj.transform.GetChild(0).transform;
-            GameObject p = koma.GetKoma2D(1);
-            GameObject g = Instantiate(p, opMochigomaInstTransform);
-            g.transform.localPosition = new Vector3(0, 0, 0);
-            g.SetLayerRecursively(9);
-
-            Transform ctr = g.transform.GetChild(0).transform;
-            GameObject mb = Instantiate(mochigomaButtonPrefab) as GameObject;
-            mb.transform.SetParent(ctr, false);
-            mb.transform.localPosition = new Vector3(0, 0, 0);
-            mb.SetLayerRecursively(9);
             
-
-            //以下、追加---------
-            //引数に何番目のボタンかを渡す
-            Button b = mb.GetComponent<Button>();
-            b.onClick.AddListener(() => ChooseMochigoma());
-            
-        }
-
-        public void ChooseMochigoma()
-        {
-            Debug.Log("Mochigoma Clicked.");
         }
 
         // Update is called once per frame
@@ -173,6 +161,7 @@ namespace PvP993
 
         public void ChangeDimension()
         {
+            is3D = !is3D;
             camera.CameraMovable = !camera.CameraMovable;
             for(int x = 0; x < xLength; x++)
             {
@@ -349,7 +338,21 @@ namespace PvP993
                         }
                     }
                 }
-                if (fromx == -1 || fromy == -1 || fromz == -1) Debug.Log("gridChooseError");
+                if (fromx == -1 || fromy == -1 || fromz == -1)
+                {
+                    Debug.Log("Choosed from Mochigoma");
+
+                    int choose = -1;
+                    if (turn == 1) for (int i = 0; i < myMochigomaBox.Count; i++) { if (myMochigomaBox[i].activeSelf) choose = i; }
+                    else for (int i = 0; i < opMochigomaBox.Count; i++) { if (opMochigomaBox[i].activeSelf) choose = i; }
+                    Debug.Log(choose);
+                    Debug.Log(myMochigomaIdx[choose]);
+                    koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(myMochigomaIdx[choose])), pushx, pushy, pushz);
+                    koma_on_board2D[pushx, pushy, pushz].SetActive(true);
+                    koma_on_board3D[pushx, pushy, pushz].SetActive(false); //PutKomaは標準で3Dを有効にするので
+                    MochigomaRemove(choose);
+                    UnActivateChoosingGrid();
+                }
                 else
                 {
                     if ((pushz >= 7 && boardstate[fromx, fromy, fromz] == 3) || (pushz <= 1 && boardstate[fromx, fromy, fromz] == -3)) boardstate[fromx, fromy, fromz] = koma.Nari(koma_on_board3D[fromx, fromy, fromz], koma_on_board2D[fromx, fromy, fromz]) * turn;
@@ -366,6 +369,7 @@ namespace PvP993
                     }
                     if (boardstate[pushx, pushy, pushz] != 0) //相手の駒が置かれている場所に移動する場合
                     {
+                        MochigomaGenerate(Math.Abs(boardstate[pushx, pushy, pushz]));
                         Destroy(koma_on_board3D[pushx, pushy, pushz]);
                         Destroy(koma_on_board2D[pushx, pushy, pushz]);
 
@@ -383,18 +387,17 @@ namespace PvP993
                     boardstate[pushx, pushy, pushz] = boardstate[fromx, fromy, fromz];
                     boardstate[fromx, fromy, fromz] = 0;
                     UnActivateChoosingGrid();
-                    greenBox2D[pushx, pushy, pushz].SetActive(true); //最後に打った手は緑に光らせておく
 
-
-                    if (record.Count >= 1)
-                    {
-                        Vector3Int lastMove = record[record.Count - 1];
-                        greenBox2D[lastMove.x, lastMove.y, lastMove.z].SetActive(false);
-                    }
-                    record.Add(new Vector3Int(pushx, pushy, pushz));
-
-                    Debug.Log(new Vector3Int(pushx, pushy, pushz) + ", " + boardstate[pushx, pushy, pushz]);
                 }
+                if (record.Count >= 1)
+                {
+                    Vector3Int lastMove = record[record.Count - 1];
+                    greenBox2D[lastMove.x, lastMove.y, lastMove.z].SetActive(false);
+                }
+                greenBox2D[pushx, pushy, pushz].SetActive(true); //今打った手を緑に光らせておく
+                record.Add(new Vector3Int(pushx, pushy, pushz));
+
+                Debug.Log(new Vector3Int(pushx, pushy, pushz) + ", " + boardstate[pushx, pushy, pushz]);
                 ChangeTurn();
             }
             else if (boardstate[pushx, pushy, pushz] * turn > 0) //手番のプレイヤーが自分の駒を選択した時
@@ -422,18 +425,182 @@ namespace PvP993
                     }
                 }
             }
+            else UnActivateChoosingGrid();
+        }
+
+        void ChooseMochigoma(GameObject komainst, int idx) //idx: 相手の桂馬なら-3, 自分の歩なら1
+        {
+            if (komainst.transform.GetChild(0).transform.GetChild(2).gameObject.activeSelf){
+                UnActivateChoosingGrid();
+                return;
+            }
+            UnActivateChoosingGrid();
+            for(int x = 0; x < xLength; x++)
+            {
+                for(int y = 0; y < yLength; y++)
+                {
+                    for(int z = 0; z < zLength; z++)
+                    {
+                        if ((idx == -3 && z <= 1) || (idx == 3 && z >= 7)) continue; //桂馬
+                        else if(boardstate[x, y, z] == 0)
+                        {
+                            if (is3D) movableGrid3D[x, y, z].SetActive(true);
+                            else movableGrid2D[x, y, z].SetActive(true);
+                        }
+                    }
+                }
+            }
+            
+            komainst.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
+            Debug.Log(komainst);
         }
 
         //持ち駒を生成して整列するメソッド
-        public void MochigomaGenerate()
+        public void MochigomaGenerate(int kind)
         {
+            if (kind >= 10) kind -= 9;
+            GameObject p = koma.GetKoma2D(kind);
+            GameObject g;
+            if (turn == 1) g = Instantiate(p, myMochigomaObj.transform);
+            else g = Instantiate(p, opponentMochigomaObj.transform);
+            g.transform.localPosition = new Vector3(-10 * turn, 0, 0);
 
+            Transform canv = g.transform.GetChild(0).transform;
+            canv.GetComponent<Canvas>().worldCamera = (turn == 1) ? underCamera : upperCamera;
+
+            GameObject but = Instantiate(mochigomaButtonPrefab, canv);
+            but.transform.localPosition = new Vector3(0, 0, 0);
+
+            Button b = but.transform.GetComponent<Button>();
+            b.onClick.AddListener(() => ChooseMochigoma(g, turn * kind));
+
+            GameObject box = Instantiate(mochigomaBoxPrefab, canv);
+            box.transform.localPosition = new Vector3(0, 0, 0);
+            box.transform.localScale = new Vector3(1, 1, 0.01f);
+            box.SetActive(false);
+
+            if (turn == 1) g.SetLayerRecursively(8);
+            else g.SetLayerRecursively(9);
+
+            int nowcnt = (turn == 1) ? myMochigomaInstance.Count : opMochigomaInstance.Count;
+            if (nowcnt != 0)
+            {
+                if(turn == 1) g.transform.localPosition = myMochigomaInstance[nowcnt - 1].transform.localPosition + new Vector3(turn, 0, 0);
+                else g.transform.localPosition = opMochigomaInstance[nowcnt - 1].transform.localPosition + new Vector3(turn, 0, 0);
+            }
+            if(turn == 1)
+            {
+                myMochigomaInstance.Add(g);
+                myMochigomaIdx.Add(turn * kind);
+                myMochigomaBox.Add(box);
+                myMochigomaButton.Add(b);
+            }
+            else
+            {
+                opMochigomaInstance.Add(g);
+                opMochigomaIdx.Add(turn * kind);
+                opMochigomaBox.Add(box);
+                opMochigomaButton.Add(b);
+            }
+
+            if(turn == 1)
+            {
+                int target = turn * kind;
+                int ins = -1;
+                for(int i = 0; i < myMochigomaIdx.Count-1; i++)
+                {
+                    if(target <= myMochigomaIdx[i]) { ins = i; break; }
+                }
+                if(ins != -1)
+                {
+                    for(int i = myMochigomaIdx.Count - 2; i >= ins; i--)
+                    {
+                        Debug.Log(i);
+                        Vector3 pos = myMochigomaInstance[i + 1].transform.localPosition; //例えば銀がi, 桂馬がi+1のとき: まずは桂馬の位置を記録
+                        GameObject inst = myMochigomaInstance[i + 1]; //桂馬のインスタンスも記憶
+                        int idx = myMochigomaIdx[i + 1];
+                        Button bt = myMochigomaButton[i + 1];
+                        GameObject bx = myMochigomaBox[i + 1];
+
+                        myMochigomaInstance[i + 1].transform.localPosition = myMochigomaInstance[i].transform.localPosition; //桂馬の位置を銀の位置と変える
+                        myMochigomaInstance[i + 1] = myMochigomaInstance[i]; //i+1の参照先を銀に変更
+                        myMochigomaIdx[i + 1] = myMochigomaIdx[i];
+                        myMochigomaButton[i + 1] = myMochigomaButton[i];
+                        myMochigomaBox[i + 1] = myMochigomaBox[i];
+                        myMochigomaInstance[i].transform.localPosition = pos; //iはまだ銀を参照してる. 銀の位置を変更
+                        myMochigomaInstance[i] = inst; //iの参照先を桂馬に変更
+                        myMochigomaIdx[i] = idx;
+                        myMochigomaButton[i] = bt;
+                        myMochigomaBox[i] = bx;
+                    }
+                }
+            }
+            else
+            {
+                int target = turn * kind;
+                int ins = -1;
+                for (int i = 0; i < opMochigomaIdx.Count - 1; i++)
+                {
+                    if (target >= opMochigomaIdx[i]) { ins = i; break; }
+                }
+                if (ins != -1)
+                {
+                    for (int i = opMochigomaIdx.Count - 2; i >= ins; i--)
+                    {
+                        Vector3 pos = opMochigomaInstance[i + 1].transform.localPosition;
+                        GameObject inst = opMochigomaInstance[i + 1];
+                        int idx = opMochigomaIdx[i + 1];
+                        Button bt = opMochigomaButton[i + 1];
+                        GameObject bx = opMochigomaBox[i + 1];
+
+                        opMochigomaInstance[i + 1].transform.localPosition = opMochigomaInstance[i].transform.localPosition;
+                        opMochigomaInstance[i + 1] = opMochigomaInstance[i];
+                        opMochigomaIdx[i + 1] = opMochigomaIdx[i];
+                        opMochigomaButton[i + 1] = opMochigomaButton[i];
+                        opMochigomaBox[i + 1] = opMochigomaBox[i];
+                        opMochigomaInstance[i].transform.localPosition = pos;
+                        opMochigomaInstance[i] = inst;
+                        opMochigomaIdx[i] = idx;
+                        opMochigomaButton[i] = bt;
+                        opMochigomaBox[i] = bx;
+                    }
+                }
+            }
         }
 
         //持ち駒の一つを盤に置いたときに再整列するメソッド
-        public void MochigomaRemove()
+        public void MochigomaRemove(int idx)
         {
+            Vector3 pos;
+            if(turn == 1)
+            {
+                pos = myMochigomaInstance[idx].transform.localPosition;
+                myMochigomaBox.RemoveAt(idx);
+                myMochigomaButton.RemoveAt(idx);
+                myMochigomaIdx.RemoveAt(idx);
+                Destroy(myMochigomaInstance[idx]);
+                myMochigomaInstance.RemoveAt(idx);
+                for(int i = myMochigomaInstance.Count - 2; i >= idx; i--)
+                {
+                    myMochigomaInstance[i + 1].transform.localPosition = myMochigomaInstance[i].transform.localPosition;
+                }
+                if(myMochigomaInstance.Count > idx) myMochigomaInstance[idx].transform.localPosition = pos;
+            }
+            else
+            {
+                pos = opMochigomaInstance[idx].transform.localPosition;
+                opMochigomaBox.RemoveAt(idx);
+                opMochigomaButton.RemoveAt(idx);
+                opMochigomaIdx.RemoveAt(idx);
 
+                Destroy(opMochigomaInstance[idx]);
+                opMochigomaInstance.RemoveAt(idx);
+                for(int i = opMochigomaInstance.Count - 2; i >= idx; i--)
+                {
+                    opMochigomaInstance[i + 1].transform.localPosition = opMochigomaInstance[i].transform.localPosition;
+                }
+                if(opMochigomaInstance.Count > idx) opMochigomaInstance[idx].transform.localPosition = pos;
+            }
         }
 
         public void ReverseView()
@@ -458,6 +625,9 @@ namespace PvP993
                     }
                 }
             }
+            foreach (GameObject box in opMochigomaBox) box.SetActive(false);
+            foreach (GameObject box in myMochigomaBox) box.SetActive(false);
+
         }
         
         public void SetGridButton2D(Button b, int x, int y, int z) { gridButton2D[x, y, z] = b; }

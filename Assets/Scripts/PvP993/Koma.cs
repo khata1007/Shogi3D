@@ -167,11 +167,19 @@ namespace PvP993
             {
                 if(dy != 0) komaMove[5].Add(new Vector3Int(0, dy, dz));
             }
+            for(int dy = -2, dz = 2; dy <= 2; dy++, dz--)
+            {
+                if (dy != 0) komaMove[5].Add(new Vector3Int(0, dy, dz));
+            }
             for (int dy = -2, dx = -2; dy <= 2; dy++, dx++)
             {
                 if(dy != 0) komaMove[5].Add(new Vector3Int(dx, dy, 0));
             }
-            for(int dx = -8, dz = -8; dx <= 8; dx++, dz++)
+            for (int dy = -2, dx = 2; dy <= 2; dy++, dx--)
+            {
+                if (dy != 0) komaMove[5].Add(new Vector3Int(dx, dy, 0));
+            }
+            for (int dx = -8, dz = -8; dx <= 8; dx++, dz++)
             {
                 if(dx != 0) komaMove[5].Add(new Vector3Int(dx, 0, dz));
             }
