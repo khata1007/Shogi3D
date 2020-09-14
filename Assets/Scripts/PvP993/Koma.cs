@@ -254,20 +254,10 @@ namespace PvP993
             for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(0, dy, -1));
             for (int dy = -1; dy <= 1; dy++) komaMove[13].Add(new Vector3Int(-1, dy, 0));
             //馬
-            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(1, dy, 1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(-1, dy, 1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(0, dy, 1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(1, dy, 0));
-            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(0, dy, -1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[14].Add(new Vector3Int(-1, dy, 0));
+            for (int i = 0; i < komaMove[8].Count; i++) komaMove[14].Add(komaMove[8][i]);
             for (int i = 0; i < komaMove[5].Count; i++) komaMove[14].Add(komaMove[5][i]);
             //竜
-            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(1, dy, 1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(-1, dy, 1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(0, dy, 1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(1, dy, 0));
-            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(0, dy, -1));
-            for (int dy = -1; dy <= 1; dy++) komaMove[15].Add(new Vector3Int(-1, dy, 0));
+            for (int i = 0; i < komaMove[8].Count; i++) komaMove[15].Add(komaMove[8][i]);
             for (int i = 0; i < komaMove[6].Count; i++) komaMove[15].Add(komaMove[6][i]);
         }
 

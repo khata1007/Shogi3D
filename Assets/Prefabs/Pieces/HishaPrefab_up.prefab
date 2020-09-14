@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5777205689404286}
   - component: {fileID: 5464891058713561483}
   m_Layer: 0
-  m_Name: HishaPrefab
+  m_Name: HishaPrefab_up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb068e554ca2f5b439d35cbdfa67a09a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mat: {fileID: 2100000, guid: d037beea9b0de0c46b6f80e5a7425c73, type: 2}
+  _mat: {fileID: 2100000, guid: 9d76029ceb7ae28418f6db58a43104ed, type: 2}
 --- !u!1 &5777206111472362
 GameObject:
   m_ObjectHideFlags: 0

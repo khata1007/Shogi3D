@@ -14,9 +14,10 @@ namespace PvP993
 
         private Color[] frameColor = new Color[]
         {
-            new Color(192/255.0f, 159/255.0f, 116/255.0f),
-            new Color(105/255.0f, 89/255.0f, 70/255.0f),
             new Color(75/255.0f, 63/255.0f, 48/255.0f),
+            new Color(95/255.0f, 84/255.0f, 60/255.0f),
+            new Color(125/255.0f, 109/255.0f, 90/255.0f),
+            //new Color(142/255.0f, 129/255.0f, 106/255.0f),
         };
 
 

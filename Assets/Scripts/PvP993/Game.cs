@@ -398,6 +398,7 @@ namespace PvP993
                 record.Add(new Vector3Int(pushx, pushy, pushz));
 
                 Debug.Log(new Vector3Int(pushx, pushy, pushz) + ", " + boardstate[pushx, pushy, pushz]);
+
                 ChangeTurn();
             }
             else if (boardstate[pushx, pushy, pushz] * turn > 0) //手番のプレイヤーが自分の駒を選択した時
@@ -485,10 +486,10 @@ namespace PvP993
             int nowcnt = (turn == 1) ? myMochigomaInstance.Count : opMochigomaInstance.Count;
             if (nowcnt != 0)
             {
-                if(turn == 1) g.transform.localPosition = myMochigomaInstance[nowcnt - 1].transform.localPosition + new Vector3(turn, 0, 0);
+                if (turn == 1) g.transform.localPosition = myMochigomaInstance[nowcnt - 1].transform.localPosition + new Vector3(turn, 0, 0);
                 else g.transform.localPosition = opMochigomaInstance[nowcnt - 1].transform.localPosition + new Vector3(turn, 0, 0);
             }
-            if(turn == 1)
+            if (turn == 1)
             {
                 myMochigomaInstance.Add(g);
                 myMochigomaIdx.Add(turn * kind);
@@ -503,17 +504,17 @@ namespace PvP993
                 opMochigomaButton.Add(b);
             }
 
-            if(turn == 1)
+            if (turn == 1)
             {
                 int target = turn * kind;
                 int ins = -1;
-                for(int i = 0; i < myMochigomaIdx.Count-1; i++)
+                for (int i = 0; i < myMochigomaIdx.Count - 1; i++)
                 {
-                    if(target <= myMochigomaIdx[i]) { ins = i; break; }
+                    if (target <= myMochigomaIdx[i]) { ins = i; break; }
                 }
-                if(ins != -1)
+                if (ins != -1)
                 {
-                    for(int i = myMochigomaIdx.Count - 2; i >= ins; i--)
+                    for (int i = myMochigomaIdx.Count - 2; i >= ins; i--)
                     {
                         Debug.Log(i);
                         Vector3 pos = myMochigomaInstance[i + 1].transform.localPosition; //例えば銀がi, 桂馬がi+1のとき: まずは桂馬の位置を記録
@@ -565,7 +566,35 @@ namespace PvP993
                         opMochigomaBox[i] = bx;
                     }
                 }
-                for(int i = 0; i < opMochigomaIdx.Count; i++) { Debug.Log(opMochigomaIdx[i]); }
+                for (int i = 0; i < opMochigomaIdx.Count; i++) { Debug.Log(opMochigomaIdx[i]); }
+            }
+            //駒の再配置
+            float newScale = 20.0f;
+            if(turn == 1)
+            {
+                if (myMochigomaInstance.Count >= 20) newScale /= myMochigomaInstance.Count;
+                else newScale = 1.0f;
+                Vector3 pos = new Vector3(-10, 0, 0);
+                Vector3 inc = new Vector3(newScale, 0, 0);
+                foreach(GameObject inst in myMochigomaInstance)
+                {
+                    inst.transform.localScale = new Vector3(newScale, newScale, newScale);
+                    inst.transform.localPosition = pos;
+                    pos += inc;
+                }
+            }
+            else
+            {
+                if (opMochigomaInstance.Count >= 20) newScale /= opMochigomaInstance.Count;
+                else newScale = 1.0f;
+                Vector3 pos = new Vector3(10, 0, 0);
+                Vector3 inc = new Vector3(-newScale, 0, 0);
+                foreach (GameObject inst in opMochigomaInstance)
+                {
+                    inst.transform.localScale = new Vector3(newScale, newScale, newScale);
+                    inst.transform.localPosition = pos;
+                    pos += inc;
+                }
             }
         }
 

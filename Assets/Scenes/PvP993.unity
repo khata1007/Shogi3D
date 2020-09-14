@@ -848,7 +848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 995d624fddce320429225cd884b780bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frameWidth3D: 0.005
+  frameWidth3D: 0.02
   frameWidth2D: 0.025
   orangeBoardPrefab3D: {fileID: 4732970784958368811, guid: 62181d7eb5bd09546805e018aa06a2ad,
     type: 3}
@@ -1319,7 +1319,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.8018868, g: 0.62335354, b: 0.35555357, a: 0}
+  m_BackGroundColor: {r: 0.8784314, g: 0.6862745, b: 0.37254903, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 8678123988991059044}
   - component: {fileID: 8678123988991059355}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GinPrefab_up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -193,7 +193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c5cb4366d33494880cd5f3148af24a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mat: {fileID: 2100000, guid: d037beea9b0de0c46b6f80e5a7425c73, type: 2}
+  _mat: {fileID: 2100000, guid: 9d76029ceb7ae28418f6db58a43104ed, type: 2}
 --- !u!1 &8678123989692281193
 GameObject:
   m_ObjectHideFlags: 0

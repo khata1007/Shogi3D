@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 5435955470572847953}
   - component: {fileID: 5435955470572847790}
   m_Layer: 0
-  m_Name: KakuPrefab
+  m_Name: KakuPrefab_up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -193,7 +193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5457123456d40ec49bfa15a9d6472756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mat: {fileID: 2100000, guid: d037beea9b0de0c46b6f80e5a7425c73, type: 2}
+  _mat: {fileID: 2100000, guid: 9d76029ceb7ae28418f6db58a43104ed, type: 2}
 --- !u!1 &5435955471215941212
 GameObject:
   m_ObjectHideFlags: 0
