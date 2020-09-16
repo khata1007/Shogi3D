@@ -37,7 +37,6 @@ namespace PvP993
 
         public void OnCancelGridChooseButtonClick()
         {
-            Debug.Log("GridChooseButton Clicked");
             game.UnActivateChoosingGrid();
         }
 

@@ -127,8 +127,7 @@ namespace PvP993
                 {"玉\n将", "玉\n将" },
         };
 
-
-        private void Start()
+        private void Awake()
         {
             komaMove = new List<Vector3Int>[16];
             for (int i = 0; i < 16; i++) komaMove[i] = new List<Vector3Int>();
@@ -138,11 +137,11 @@ namespace PvP993
             komaMove[1].Add(new Vector3Int(0, 0, 1));
 
             //香の動き
-            for(int dy = -2; dy <= 2; dy++)
+            for (int dy = -2; dy <= 2; dy++)
             {
-                if(dy != 0) komaMove[2].Add(new Vector3Int(0, dy, 0));
+                if (dy != 0) komaMove[2].Add(new Vector3Int(0, dy, 0));
             }
-            for(int dz = 1; dz <= 8; dz++)
+            for (int dz = 1; dz <= 8; dz++)
             {
                 komaMove[2].Add(new Vector3Int(0, 0, dz));
             }
@@ -154,26 +153,26 @@ namespace PvP993
             komaMove[3].Add(new Vector3Int(0, -1, 2));
 
             //銀
-            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(1, dy, 1));
-            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(-1, dy, 1));
-            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(0, dy, 1));
-            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(1, dy, -1));
-            for(int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(-1, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(-1, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(0, dy, 1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(1, dy, -1));
+            for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(-1, dy, -1));
             //komaMove[4].Add(new Vector3Int(1, 1, 0));
             //komaMove[4].Add(new Vector3Int(1, -1, 0));
 
             //角
-            for(int dy = -2, dz = -2; dy <= 2; dy++, dz++)
+            for (int dy = -2, dz = -2; dy <= 2; dy++, dz++)
             {
-                if(dy != 0) komaMove[5].Add(new Vector3Int(0, dy, dz));
+                if (dy != 0) komaMove[5].Add(new Vector3Int(0, dy, dz));
             }
-            for(int dy = -2, dz = 2; dy <= 2; dy++, dz--)
+            for (int dy = -2, dz = 2; dy <= 2; dy++, dz--)
             {
                 if (dy != 0) komaMove[5].Add(new Vector3Int(0, dy, dz));
             }
             for (int dy = -2, dx = -2; dy <= 2; dy++, dx++)
             {
-                if(dy != 0) komaMove[5].Add(new Vector3Int(dx, dy, 0));
+                if (dy != 0) komaMove[5].Add(new Vector3Int(dx, dy, 0));
             }
             for (int dy = -2, dx = 2; dy <= 2; dy++, dx--)
             {
@@ -181,22 +180,22 @@ namespace PvP993
             }
             for (int dx = -8, dz = -8; dx <= 8; dx++, dz++)
             {
-                if(dx != 0) komaMove[5].Add(new Vector3Int(dx, 0, dz));
+                if (dx != 0) komaMove[5].Add(new Vector3Int(dx, 0, dz));
             }
-            for(int dx = -8, dz = 8; dx <= 8; dx++, dz--)
+            for (int dx = -8, dz = 8; dx <= 8; dx++, dz--)
             {
-                if(dx != 0) komaMove[5].Add(new Vector3Int(dx, 0, dz));
+                if (dx != 0) komaMove[5].Add(new Vector3Int(dx, 0, dz));
             }
             //飛
-            for(int dy = -2; dy <= 2; dy++)
+            for (int dy = -2; dy <= 2; dy++)
             {
                 if (dy != 0) komaMove[6].Add(new Vector3Int(0, dy, 0));
             }
-            for(int dx = -8; dx <= 8; dx++)
+            for (int dx = -8; dx <= 8; dx++)
             {
                 if (dx != 0) komaMove[6].Add(new Vector3Int(dx, 0, 0));
             }
-            for(int dz = -8; dz <= 8; dz++)
+            for (int dz = -8; dz <= 8; dz++)
             {
                 if (dz != 0) komaMove[6].Add(new Vector3Int(0, 0, dz));
             }
@@ -213,11 +212,11 @@ namespace PvP993
             //komaMove[7].Add(new Vector3Int(0, -1, 1));
 
             //王,玉
-            for(int dx = -1; dx <= 1; dx++)
+            for (int dx = -1; dx <= 1; dx++)
             {
-                for(int dy = -1; dy <= 1; dy++)
+                for (int dy = -1; dy <= 1; dy++)
                 {
-                    for(int dz = -1; dz <= 1; dz++)
+                    for (int dz = -1; dz <= 1; dz++)
                     {
                         if (dx == 0 && dy == 0 && dz == 0) continue;
                         komaMove[8].Add(new Vector3Int(dx, dy, dz));
@@ -259,6 +258,12 @@ namespace PvP993
             //竜
             for (int i = 0; i < komaMove[8].Count; i++) komaMove[15].Add(komaMove[8][i]);
             for (int i = 0; i < komaMove[6].Count; i++) komaMove[15].Add(komaMove[6][i]);
+        }
+
+
+        private void Start()
+        {
+            
         }
 
         public async UniTask<bool> CheckNari()
@@ -334,7 +339,7 @@ namespace PvP993
         }
 
        
-        public static List<Vector3Int> getKomaMove(int k) { return komaMove[k]; }
+        public static List<Vector3Int> getKomaMove(int k) { return komaMove[Math.Abs(k)]; }
         public GameObject GetKoma3D(int k) { return pieces[k]; }
         public GameObject GetKoma2D(int k) { return pieces2D[k]; }
         public float KomaScale2D { set { this.komaScale2D = value; } }
