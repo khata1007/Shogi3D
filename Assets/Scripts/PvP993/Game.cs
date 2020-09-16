@@ -175,6 +175,8 @@ namespace PvP993
             boardstate[0, 0, 0] = koma.Nari(koma_on_board3D[0, 0, 0]);
             Debug.Log(rule.getVal(0, 0, 0));
             */
+            Vector3Int temp = myOuPos;
+            
             
         }
 
@@ -213,6 +215,10 @@ namespace PvP993
                     if (turn == 1) for (int i = 0; i < myMochigomaBox.Count; i++) { if (myMochigomaBox[i].activeSelf) choose = i; }
                     else for (int i = 0; i < opMochigomaBox.Count; i++) { if (opMochigomaBox[i].activeSelf) choose = i; }
 
+                    if ((turn == 1 && !CheckLegal(myMochigomaIdx[choose], new Vector3Int(-1, -1, -1), new Vector3Int(pushx, pushy, pushz)))
+                    || (turn == -1 && !CheckLegal(opMochigomaIdx[choose], new Vector3Int(-1, -1, -1), new Vector3Int(pushx, pushy, pushz))))
+                        return; //合法手じゃなければなんもせずにreturn
+
                     if (turn == 1) koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(myMochigomaIdx[choose])), pushx, pushy, pushz);
                     else koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(opMochigomaIdx[choose])), pushx, pushy, pushz);
                     koma_on_board2D[pushx, pushy, pushz].SetActive(true);
@@ -222,6 +228,8 @@ namespace PvP993
                 }
                 else
                 {
+                    if (!CheckLegal(boardstate[fromx, fromy, fromz], new Vector3Int(fromx, fromy, fromz), new Vector3Int(pushx, pushy, pushz))) return; //合法手でなければreturn
+
                     if ((pushz >= 7 && boardstate[fromx, fromy, fromz] == 3) || (pushz <= 1 && boardstate[fromx, fromy, fromz] == -3)) boardstate[fromx, fromy, fromz] = koma.Nari(koma_on_board3D[fromx, fromy, fromz], koma_on_board2D[fromx, fromy, fromz]) * turn;
                     else if ((pushz >= 6 && 1 <= boardstate[fromx, fromy, fromz] && boardstate[fromx, fromy, fromz] <= 6) ||
                              (pushz <= 2 && -6 <= boardstate[fromx, fromy, fromz] && boardstate[fromx, fromy, fromz] <= -1))
@@ -232,9 +240,7 @@ namespace PvP993
                         bool res = await koma.CheckNari();
                         if (res)
                         {
-                            //CalcReachableRange(boardstate[fromx, fromy, fromz], turn, new Vector3Int(fromx, fromy, fromz), -1); //成る前の駒の到達範囲を-1
                             boardstate[fromx, fromy, fromz] = koma.Nari(koma_on_board3D[fromx, fromy, fromz], koma_on_board2D[fromx, fromy, fromz]) * turn;
-                            //CalcReachableRange(boardstate[fromx, fromy, fromz], turn, new Vector3Int(fromx, fromy, fromz), 1); //成った後の駒の到達範囲を+1
                         }
                         nariConfirmCanvas.SetActive(false);
                         mouseDetectable = true;
@@ -242,7 +248,6 @@ namespace PvP993
                     if (boardstate[pushx, pushy, pushz] != 0) //相手の駒が置かれている場所に移動する場合
                     {
                         MochigomaGenerate(Math.Abs(boardstate[pushx, pushy, pushz]));
-                        //CalcReachableRange(boardstate[pushx, pushy, pushz], -turn, new Vector3Int(pushx, pushy, pushz), -1); //取得する相手の駒の到達範囲を-1
                         Destroy(koma_on_board3D[pushx, pushy, pushz]);
                         Destroy(koma_on_board2D[pushx, pushy, pushz]);
                     }
@@ -255,11 +260,9 @@ namespace PvP993
                     koma_on_board3D[fromx, fromy, fromz] = null;
                     koma_on_board2D[pushx, pushy, pushz] = koma_on_board2D[fromx, fromy, fromz];
                     koma_on_board2D[fromx, fromy, fromz] = null;
-
-                    //CalcReachableRange(boardstate[fromx, fromy, fromz], turn, new Vector3Int(fromx, fromy, fromz), -1);
+                    
                     boardstate[pushx, pushy, pushz] = boardstate[fromx, fromy, fromz];
                     boardstate[fromx, fromy, fromz] = 0;
-                    //CalcReachableRange(boardstate[pushx, pushy, pushz], turn, new Vector3Int(pushx, pushy, pushz), 1);
                     UnActivateChoosingGrid();
 
                     //王を動かしてるかどうかチェック
@@ -296,7 +299,6 @@ namespace PvP993
                     UnActivateChoosingGrid();
                     return;
                 }
-                //選択マスの orangeBoard による色付け 軌道上の駒を無視したら最大Nマス移動可能として計算量O(N^2) (必要に応じて改善)
                 UnActivateChoosingGrid();
                 if (boardstate[pushx, pushy, pushz] != 0) orangeBox2D[pushx, pushy, pushz].SetActive(true);
 
@@ -322,8 +324,9 @@ namespace PvP993
             return new Vector3Int(now.x + inc.x * owner, now.y + inc.y, now.z + inc.z * owner);
         }
 
-        private void CalcReachableRange() 
+        private void CalcReachableRange(int[,,] work = null) //workで与えた盤面における盤上の駒の到達範囲を計算 何も与えなければboardstateについて計算
         {
+            if (work == null) work = boardstate;
             for(int x = 0; x < xLength; x++)
             {
                 for(int y = 0; y < yLength; y++)
@@ -342,24 +345,24 @@ namespace PvP993
                     for(int z = 0; z < zLength; z++)
                     {
                         Vector3Int now = new Vector3Int(x, y, z);
-                        if(boardstate[x, y, z] > 0)
+                        if(work[x, y, z] > 0)
                         {
-                            List<Vector3Int> komaMoveList = Koma.getKomaMove(boardstate[x, y, z]);
+                            List<Vector3Int> komaMoveList = Koma.getKomaMove(work[x, y, z]);
                             foreach (Vector3Int komaMove in komaMoveList)
                             {
                                 Vector3Int next = CalcNextPos(now, komaMove, 1);
-                                if (boardstate[x, y, z] == 3 && CheckBound(next) && CheckMovable(boardstate, now, next, true)) myReachablePieces[next.x, next.y, next.z]++;
-                                else if (boardstate[x, y, z] != 3 && CheckBound(next) && CheckMovable(boardstate, now, next)) myReachablePieces[next.x, next.y, next.z]++;
+                                if (work[x, y, z] == 3 && CheckBound(next) && CheckMovable(work, now, next, true)) myReachablePieces[next.x, next.y, next.z]++;
+                                else if (work[x, y, z] != 3 && CheckBound(next) && CheckMovable(work, now, next)) myReachablePieces[next.x, next.y, next.z]++;
                             }
                         }
-                        else if(boardstate[x, y, z] < 0)
+                        else if(work[x, y, z] < 0)
                         {
-                            List<Vector3Int> komaMoveList = Koma.getKomaMove(boardstate[x, y, z]);
+                            List<Vector3Int> komaMoveList = Koma.getKomaMove(work[x, y, z]);
                             foreach (Vector3Int komaMove in komaMoveList)
                             {
                                 Vector3Int next = CalcNextPos(now, komaMove, -1);
-                                if (boardstate[x, y, z] == -3 && CheckBound(next) && CheckMovable(boardstate, now, next, true)) opReachablePieces[next.x, next.y, next.z]++;
-                                else if (boardstate[x, y, z] != -3 && CheckBound(next) && CheckMovable(boardstate, now, next)) opReachablePieces[next.x, next.y, next.z]++;
+                                if (work[x, y, z] == -3 && CheckBound(next) && CheckMovable(work, now, next, true)) opReachablePieces[next.x, next.y, next.z]++;
+                                else if (work[x, y, z] != -3 && CheckBound(next) && CheckMovable(work, now, next)) opReachablePieces[next.x, next.y, next.z]++;
                             }
                         }
                     }
@@ -473,23 +476,8 @@ namespace PvP993
             }
         }
 
-        private void ChangeTurn() //手番を終えたプレイヤーの持ち駒および盤上の駒を選択できなくする -> 駒が取れなくなるので盤上の駒でそれやっちゃダメ
+        private void ChangeTurn() //手番を終えたプレイヤーの持ち駒を選択できなくする 
         {
-            /*
-            for(int x = 0; x < xLength; x++)
-            {
-                for(int y = 0; y < yLength; y++)
-                {
-                    for(int z = 0; z < zLength; z++)
-                    {
-                        if (turn * boardstate[x, y, z] > 0) gridButton2D[x, y, z].enabled = false;
-                        else gridButton2D[x, y, z].enabled = true;
-                    }
-                }
-            }
-            */
-
-            //持ち駒に関しては一考の余地あり
             if (turn == 1)
             {
                 foreach (Button b in myMochigomaButton) b.enabled = false;
@@ -507,6 +495,91 @@ namespace PvP993
         private bool CheckBound(Vector3Int vec) //座標の境界チェック
         {
             return (0 <= vec.x && vec.x < xLength) && (0 <= vec.y && vec.y < yLength) && (0 <= vec.z && vec.z < zLength);
+        }
+
+        private bool CheckLegal(int k, Vector3Int from, Vector3Int to)
+        {
+            bool ret = true;
+            int[,,] work = new int[xLength, yLength, zLength];
+            for(int x = 0; x < xLength; x++)
+            {
+                for(int y = 0; y < yLength; y++)
+                {
+                    for(int z = 0; z < zLength; z++)
+                    {
+                        work[x, y, z] = boardstate[x, y, z];
+                    }
+                }
+            }
+            //詰みのチェックをする前に到達可能範囲の再計算を行う必要あり
+            int temp = work[to.x, to.y, to.z];
+            if (from.x == -1)
+            {
+                work[to.x, to.y, to.z] = k;
+            }
+            else
+            {
+                work[to.x, to.y, to.z] = work[from.x, from.y, from.z];
+                work[from.x, from.y, from.z] = 0;
+            }
+            CalcReachableRange(work);
+            if(from.x == -1)
+            {
+                if(Math.Abs(k) == 1 && CheckTsumi())
+                {
+                    Debug.Log("打歩詰めです");
+                    ret = false;
+                }
+            }
+            else
+            {
+                Vector3Int nowOu;
+                if(turn == 1)
+                {
+                    //自分の王を見つける
+                    //その座標に相手が到達できるならダメ（自殺手の禁止）
+                    nowOu = myOuPos;
+                    for(int dx = -1; dx <= 1; dx++)
+                    {
+                        for(int dy = -1; dy <= 1; dy++)
+                        {
+                            for(int dz = -1; dz <= 1; dz++)
+                            {
+                                Vector3Int pos = nowOu + new Vector3Int(dx, dy, dz);
+                                if (CheckBound(pos) && work[pos.x, pos.y, pos.z] == 8 && opReachablePieces[pos.x, pos.y, pos.z] > 0)
+                                {
+                                    Debug.Log("自殺手です");
+                                    ret = false;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    nowOu = opOuPos;
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        for (int dy = -1; dy <= 1; dy++)
+                        {
+                            for (int dz = -1; dz <= 1; dz++)
+                            {
+                                Vector3Int pos = nowOu + new Vector3Int(dx, dy, dz);
+                                if (CheckBound(pos) && work[pos.x, pos.y, pos.z] == -9 && myReachablePieces[pos.x, pos.y, pos.z] > 0)
+                                {
+                                    Debug.Log("自殺手です");
+                                    ret = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if(from.x != -1) work[from.x, from.y, from.z] = 0;
+            work[to.x, to.y, to.z] = temp;
+            CalcReachableRange(work); //原状復帰
+
+            return ret;
         }
 
         private bool CheckMovable(int[,,] work, Vector3Int start, Vector3Int goal, bool keima = false) //startからgoalまでに遮蔽する駒はないか
@@ -693,13 +766,6 @@ namespace PvP993
                 myMochigomaIdx.RemoveAt(idx);
                 Destroy(myMochigomaInstance[idx]);
                 myMochigomaInstance.RemoveAt(idx);
-                /*
-                for(int i = myMochigomaInstance.Count - 2; i >= idx; i--)
-                {
-                    myMochigomaInstance[i + 1].transform.localPosition = myMochigomaInstance[i].transform.localPosition;
-                }
-                if(myMochigomaInstance.Count > idx) myMochigomaInstance[idx].transform.localPosition = pos;
-                */
             }
             else
             {
@@ -707,21 +773,15 @@ namespace PvP993
                 opMochigomaBox.RemoveAt(idx);
                 opMochigomaButton.RemoveAt(idx);
                 opMochigomaIdx.RemoveAt(idx);
-
                 Destroy(opMochigomaInstance[idx]);
                 opMochigomaInstance.RemoveAt(idx);
-                /*
-                for(int i = opMochigomaInstance.Count - 2; i >= idx; i--)
-                {
-                    opMochigomaInstance[i + 1].transform.localPosition = opMochigomaInstance[i].transform.localPosition;
-                }
-                if(opMochigomaInstance.Count > idx) opMochigomaInstance[idx].transform.localPosition = pos;
-                */
             }
+
+            //駒の再配置
             MochigomaRelocate();
         }
 
-        private void MochigomaRelocate()
+        private void MochigomaRelocate() //画面右端を超えないように持ち駒の位置調整
         {
             float newScale = 20.0f;
             if (turn == 1)
@@ -752,7 +812,7 @@ namespace PvP993
             }
         }
 
-        private Vector3Int CheckOute() //相手（turn*-1）の王に王手がかかっているかを判定. かかっているならその座標を返す
+        private Vector3Int CheckOute() //相手（turn*-1）の王に王手がかかっているかを判定. かかっているなら王手をかけている駒の座標を返す
         {
             if(turn == 1)
             {
@@ -790,7 +850,7 @@ namespace PvP993
             }
             return new Vector3Int(-1, -1, -1);
         }
-        private Vector3Int CheckOute(int[,,] work, Vector3Int newOuPos) //相手（turn*-1）の王に王手がかかっているかを判定. かかっているならその座標を返す
+        private Vector3Int CheckOute(int[,,] work, Vector3Int newOuPos) // 相手（turn*-1）の王に王手がかかっているかを判定. かかっているならその座標を返す
         {
             if (turn == 1)
             {
@@ -829,7 +889,7 @@ namespace PvP993
             return new Vector3Int(-1, -1, -1);
         }
 
-        private int GameSet(bool hansoku = false) //手番終了時に毎回呼び出される
+        private bool CheckTsumi()
         {
             //詰みの判定
             //王手をかけている駒を取れるなら問題なし
@@ -877,20 +937,20 @@ namespace PvP993
                         */
 
                         //取った結果、王が取られなければセーフ
-                        for(int x = 0; x < xLength; x++)
+                        for (int x = 0; x < xLength; x++)
                         {
-                            for(int y = 0; y < yLength; y++)
+                            for (int y = 0; y < yLength; y++)
                             {
-                                for(int z = 0; z < zLength; z++)
+                                for (int z = 0; z < zLength; z++)
                                 {
-                                    if(work[x, y, z] < 0 && CheckMovable_Specific(work, boardstate[x, y, z], turn, new Vector3Int(x, y, z), oute))
+                                    if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), oute))
                                     {
                                         //自分が王手をかけている駒を取れる相手の駒全てに対し, 実際に王手の駒を取ると王が取られてしまわないかチェック
                                         bool isOu = (Math.Abs(work[x, y, z]) == 8 || Math.Abs(work[x, y, z]) == 9) ? true : false;
                                         int temp = work[oute.x, oute.y, oute.z];
                                         work[oute.x, oute.y, oute.z] = work[x, y, z];
                                         work[x, y, z] = 0;
-                                        if(isOu && CheckOute(work, oute).x == -1)
+                                        if (isOu && CheckOute(work, oute).x == -1)
                                         {
                                             Debug.Log("王が取っても生き残れるよ");
                                             tsumi = false;
@@ -924,20 +984,20 @@ namespace PvP993
                             }
                         }
                     }
-                    if (tsumi && boardstate[oute.x, oute.y, oute.z] != 3)
+                    if (tsumi && work[oute.x, oute.y, oute.z] != 3)
                     {
                         //貼り駒ができるかどうか
                         int mx = Math.Max(Math.Abs(diff.x), Math.Max(Math.Abs(diff.y), Math.Abs(diff.z)));
                         Vector3Int inc = diff / mx;
-                        for(Vector3Int loc = opOuPos + inc; loc != oute; loc += inc)
+                        for (Vector3Int loc = opOuPos + inc; loc != oute; loc += inc)
                         {
-                            for(int x = 0; x < xLength; x++)
+                            for (int x = 0; x < xLength; x++)
                             {
-                                for(int y = 0; y < yLength; y++)
+                                for (int y = 0; y < yLength; y++)
                                 {
-                                    for(int z = 0; z < zLength; z++)
+                                    for (int z = 0; z < zLength; z++)
                                     {
-                                        if(boardstate[x, y, z] < 0 && CheckMovable_Specific(work, boardstate[x, y, z], -turn, new Vector3Int(x, y, z), loc))
+                                        if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), loc))
                                         {
                                             int temp = work[loc.x, loc.y, loc.z];
                                             work[loc.x, loc.y, loc.z] = work[x, y, z];
@@ -953,7 +1013,7 @@ namespace PvP993
                                     }
                                 }
                             }
-                            foreach(int opMochigoma in opMochigomaIdx)
+                            foreach (int opMochigoma in opMochigomaIdx)
                             {
                                 //locに置けるかどうかの判定（二歩は本来はダメになると思うので後で実装）
                                 //if(puttable(opMochigoma, loc)) tsumi = false
@@ -992,14 +1052,14 @@ namespace PvP993
                             {
                                 for (int z = 0; z < zLength; z++)
                                 {
-                                    if (work[x, y, z] > 0 && CheckMovable_Specific(work, boardstate[x, y, z], turn, new Vector3Int(x, y, z), oute))
+                                    if (work[x, y, z] > 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), oute))
                                     {
                                         //自分が王手をかけている駒を取れる相手の駒全てに対し, 実際に王手の駒を取ると王が取られてしまわないかチェック
                                         bool isOu = (8 <= Math.Abs(work[x, y, z]) && Math.Abs(work[x, y, z]) <= 9) ? true : false;
                                         int temp = work[oute.x, oute.y, oute.z];
                                         work[oute.x, oute.y, oute.z] = work[x, y, z];
                                         work[x, y, z] = 0;
-                                        if(isOu && CheckOute(work, oute).x == -1)
+                                        if (isOu && CheckOute(work, oute).x == -1)
                                         {
                                             Debug.Log("王が取っても生き残れるよ");
                                             tsumi = false;
@@ -1032,7 +1092,7 @@ namespace PvP993
                             }
                         }
                     }
-                    if (tsumi && boardstate[oute.x, oute.y, oute.z] != -3)
+                    if (tsumi && work[oute.x, oute.y, oute.z] != -3)
                     {
                         //貼り駒ができるかどうか
                         int mx = Math.Max(Math.Abs(diff.x), Math.Max(Math.Abs(diff.y), Math.Abs(diff.z)));
@@ -1046,7 +1106,7 @@ namespace PvP993
                                 {
                                     for (int z = 0; z < zLength; z++)
                                     {
-                                        if (boardstate[x, y, z] < 0 && CheckMovable_Specific(work, boardstate[x, y, z], turn, new Vector3Int(x, y, z), loc))
+                                        if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), loc))
                                         {
                                             int temp = work[loc.x, loc.y, loc.z];
                                             work[loc.x, loc.y, loc.z] = work[x, y, z];
@@ -1074,7 +1134,13 @@ namespace PvP993
                 }
             }
             else tsumi = false; //王手がかかっていない
-            return tsumi ? turn : 0;
+            return tsumi;
+        }
+
+        private int GameSet(bool hansoku = false) //手番終了時に毎回呼び出される
+        {
+            if (hansoku) return -turn;
+            else return (CheckTsumi()) ? turn : 0;
         }
 
         public void ReverseView()
