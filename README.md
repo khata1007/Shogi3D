@@ -1,5 +1,5 @@
 # Shogi3D
 unityで3D将棋を作っています
 
-![image1](ReadmeImages/shogi1.png "image")
-![image2](ReadmeImages/shogi2.png "image2")
+<img src="https://github.com/khata1007/Shogi3D/blob/master/ReadmeImages/shogi1.png" width="320px">
+<img src="https://github.com/khata1007/Shogi3D/blob/master/ReadmeImages/shogi2.png" width="320px">
