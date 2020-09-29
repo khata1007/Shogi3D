@@ -522,6 +522,7 @@ namespace PvP993
                 work[to.x, to.y, to.z] = work[from.x, from.y, from.z];
                 work[from.x, from.y, from.z] = 0;
             }
+            Debug.Log(k + " from " + new Vector3Int(from.x, from.y, from.z) + " to " + new Vector3Int(to.x, to.y, to.z));
             CalcReachableRange(work);
             if(from.x == -1)
             {
@@ -531,51 +532,63 @@ namespace PvP993
                     ret = false;
                 }
             }
-            else
+
+            Vector3Int nowOu;
+            if (turn == 1)
             {
-                Vector3Int nowOu;
-                if(turn == 1)
+                //自分の王を見つける
+                //その座標に相手が到達できるならダメ（自殺手の禁止）
+                nowOu = myOuPos;
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    //自分の王を見つける
-                    //その座標に相手が到達できるならダメ（自殺手の禁止）
-                    nowOu = myOuPos;
-                    for(int dx = -1; dx <= 1; dx++)
+                    for (int dy = -1; dy <= 1; dy++)
                     {
-                        for(int dy = -1; dy <= 1; dy++)
+                        for (int dz = -1; dz <= 1; dz++)
                         {
-                            for(int dz = -1; dz <= 1; dz++)
+                            Vector3Int pos = nowOu + new Vector3Int(dx, dy, dz);
+                            if (CheckBound(pos) && work[pos.x, pos.y, pos.z] == 8 && opReachablePieces[pos.x, pos.y, pos.z] > 0)
                             {
-                                Vector3Int pos = nowOu + new Vector3Int(dx, dy, dz);
-                                if (CheckBound(pos) && work[pos.x, pos.y, pos.z] == 8 && opReachablePieces[pos.x, pos.y, pos.z] > 0)
+                                Debug.Log("自殺手です");
+                                for (int x = 0; x < xLength; x++)
                                 {
-                                    Debug.Log("自殺手です");
-                                    ret = false;
+                                    for (int y = 0; y < yLength; y++)
+                                    {
+                                        for (int z = 0; z < zLength; z++)
+                                        {
+                                            if (boardstate[x, y, z] < 0 && CheckMovable_Specific(work, boardstate[x, y, z], -1, new Vector3Int(x, y, z), new Vector3Int(pos.x, pos.y, pos.z)))
+                                            {
+                                                Debug.Log("Piece " + new Vector3Int(x, y, z) + " can reach Ou");
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    nowOu = opOuPos;
-                    for (int dx = -1; dx <= 1; dx++)
-                    {
-                        for (int dy = -1; dy <= 1; dy++)
-                        {
-                            for (int dz = -1; dz <= 1; dz++)
-                            {
-                                Vector3Int pos = nowOu + new Vector3Int(dx, dy, dz);
-                                if (CheckBound(pos) && work[pos.x, pos.y, pos.z] == -9 && myReachablePieces[pos.x, pos.y, pos.z] > 0)
-                                {
-                                    Debug.Log("自殺手です");
-                                    ret = false;
-                                }
+                                ret = false;
                             }
                         }
                     }
                 }
             }
-            if(from.x != -1) work[from.x, from.y, from.z] = 0;
+            else
+            {
+                nowOu = opOuPos;
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        for (int dz = -1; dz <= 1; dz++)
+                        {
+                            Vector3Int pos = nowOu + new Vector3Int(dx, dy, dz);
+                            if (CheckBound(pos) && work[pos.x, pos.y, pos.z] == -9 && myReachablePieces[pos.x, pos.y, pos.z] > 0)
+                            {
+                                Debug.Log("自殺手です");
+                                ret = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (from.x != -1) work[from.x, from.y, from.z] = work[to.x, to.y, to.z];
             work[to.x, to.y, to.z] = temp;
             CalcReachableRange(work); //原状復帰
 
@@ -591,7 +604,7 @@ namespace PvP993
                 int posx = start.x + dx, posy = start.y + dy, posz = start.z + dz;
                 while (posx != goal.x || posy != goal.y || posz != goal.z)
                 {
-                    if (boardstate[posx, posy, posz] != 0) return false;
+                    if (work[posx, posy, posz] != 0) return false;
                     posx += dx; posy += dy; posz += dz;
                 }
             }
@@ -984,7 +997,7 @@ namespace PvP993
                             }
                         }
                     }
-                    if (tsumi && work[oute.x, oute.y, oute.z] != 3)
+                    if (work[oute.x, oute.y, oute.z] != 3)
                     {
                         //貼り駒ができるかどうか
                         int mx = Math.Max(Math.Abs(diff.x), Math.Max(Math.Abs(diff.y), Math.Abs(diff.z)));
@@ -1092,7 +1105,7 @@ namespace PvP993
                             }
                         }
                     }
-                    if (tsumi && work[oute.x, oute.y, oute.z] != -3)
+                    if (work[oute.x, oute.y, oute.z] != -3)
                     {
                         //貼り駒ができるかどうか
                         int mx = Math.Max(Math.Abs(diff.x), Math.Max(Math.Abs(diff.y), Math.Abs(diff.z)));
@@ -1106,7 +1119,7 @@ namespace PvP993
                                 {
                                     for (int z = 0; z < zLength; z++)
                                     {
-                                        if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), loc))
+                                        if (work[x, y, z] > 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), loc))
                                         {
                                             int temp = work[loc.x, loc.y, loc.z];
                                             work[loc.x, loc.y, loc.z] = work[x, y, z];
@@ -1119,6 +1132,7 @@ namespace PvP993
                                             work[x, y, z] = work[loc.x, loc.y, loc.z];
                                             work[loc.x, loc.y, loc.z] = temp;
                                         }
+                                        else if (work[x, y, z] == 7) Debug.Log(work[x, y, z] + " at " + new Vector3Int(x, y, z) + "cannot reach " + loc);
                                     }
                                 }
                             }

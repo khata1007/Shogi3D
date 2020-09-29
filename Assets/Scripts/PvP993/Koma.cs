@@ -158,6 +158,8 @@ namespace PvP993
             for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(0, dy, 1));
             for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(1, dy, -1));
             for (int dy = -1; dy <= 1; dy++) komaMove[4].Add(new Vector3Int(-1, dy, -1));
+            komaMove[4].Add(new Vector3Int(0, -1, 0));
+            komaMove[4].Add(new Vector3Int(0, 1, 0));
             //komaMove[4].Add(new Vector3Int(1, 1, 0));
             //komaMove[4].Add(new Vector3Int(1, -1, 0));
 
@@ -206,9 +208,9 @@ namespace PvP993
             for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(1, dy, 0));
             for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(0, dy, -1));
             for (int dy = -1; dy <= 1; dy++) komaMove[7].Add(new Vector3Int(-1, dy, 0));
-            //komaMove[7].Add(new Vector3Int(0, 1, 0));
+            komaMove[7].Add(new Vector3Int(0, 1, 0));
             //komaMove[7].Add(new Vector3Int(0, 1, 1));
-            //komaMove[7].Add(new Vector3Int(0, -1, 0));
+            komaMove[7].Add(new Vector3Int(0, -1, 0));
             //komaMove[7].Add(new Vector3Int(0, -1, 1));
 
             //王,玉
