@@ -50,20 +50,6 @@ namespace PvP993
         };
         //---------------ここまで駒の設計図-----------------//
 
-        private static readonly Dictionary<Kind, int> kind_to_piece = //PutKomaでkindを目的のpiecesに変換するためのdictionary
-            new Dictionary<Kind, int>()
-        {
-                {Kind.Fu, 1 },
-                {Kind.Kyo,2 },
-                {Kind.Kei, 3 },
-                {Kind.Gin, 4 },
-                {Kind.Kin, 7 },
-                {Kind.Kak, 5 },
-                {Kind.Hi, 6 },
-                {Kind.Ou, 8 },
-                {Kind.Gyo, 9 },
-        };
-
         private Color[] komaColor = new Color[]
         {
             new Color(0, 0, 0),
@@ -71,46 +57,26 @@ namespace PvP993
             new Color(0, 0, 0),
         };
 
-        private static readonly Dictionary<int, int> komaGet =
-            new Dictionary<int, int>()
-        {
-                {1, -1 }, {-1, 1 },
-                {2, -2 }, {-2, 2 },
-                {3, -3 }, {-3, 3 },
-                {4, -4 }, {-4, 4 },
-                {5, -5 }, {-5, 5 },
-                {6, -6 }, {-6, 6 },
-                {7, -7 }, {-7, 7 },
-                {8, -8 }, {-8, 8 },
-                {9, -9 }, {-9, 9 },
-                {10, -1 }, {-10, 1 },
-                {11, -2 }, {-11, 2 },
-                {12, -3 }, {-12, 3 },
-                {13, -4 }, {-13, 4 },
-                {14, -5 }, {-14, 5 },
-                {15, -6 }, {-15, 6 },
-        };
-
         private static List<Vector3Int>[] komaMove;
 
         private static readonly Dictionary<string, int> komaName_to_kind =
             new Dictionary<string, int>()
         {
-                {"歩", 1 },
-                {"香\n車", 2 },
-                {"桂\n馬", 3 },
-                {"銀\n将", 4 },
-                {"角\n行", 5 },
-                {"飛\n車", 6 },
-                {"金\n将", 7 },
-                {"王\n将", 8 },
-                {"玉\n将", 9 },
-                {"と", 10 },
-                {"成\n香", 11 },
-                {"成\n桂", 12 },
-                {"成\n銀", 13 },
-                {"馬", 14 },
-                {"竜", 15 },
+                {"歩", (int) Kind.Fu },
+                {"香\n車", (int) Kind.Kyo },
+                {"桂\n馬", (int) Kind.Kei },
+                {"銀\n将", (int) Kind.Gin },
+                {"角\n行", (int) Kind.Kak },
+                {"飛\n車", (int) Kind.Hi },
+                {"金\n将", (int) Kind.Kin },
+                {"王\n将", (int) Kind.Ou },
+                {"玉\n将", (int) Kind.Gyo },
+                {"と", (int) Kind.To },
+                {"成\n香", (int) Kind.NariKyo },
+                {"成\n桂", (int) Kind.NariKei },
+                {"成\n銀", (int) Kind.NariGin },
+                {"馬", (int) Kind.Uma },
+                {"竜", (int) Kind.Ryu },
         };
 
         private static readonly Dictionary<string, string> nari =
@@ -296,19 +262,19 @@ namespace PvP993
             //その他の駒の配置
             PutKoma(1, Kind.Kin, 3, 0, 0);
             PutKoma(1, Kind.Kin, 5, 0, 0);
-            PutKoma(-1,Kind.Kin, 3, 2, 8);
-            PutKoma(-1,Kind.Kin, 5, 2, 8);
+            PutKoma(-1, Kind.Kin, 3, 2, 8);
+            PutKoma(-1, Kind.Kin, 5, 2, 8);
             PutKoma(1, Kind.Ou, 4, 0, 0);
-            PutKoma(-1,Kind.Gyo, 4, 2, 8);
+            PutKoma(-1, Kind.Gyo, 4, 2, 8);
             PutKoma(1, Kind.Kak, 1, 0, 1);
-            PutKoma(-1,Kind.Kak, 7, 2, 7);
+            PutKoma(-1, Kind.Kak, 7, 2, 7);
             PutKoma(1, Kind.Hi, 7, 0, 1);
-            PutKoma(-1,Kind.Hi, 1, 2, 7);
+            PutKoma(-1, Kind.Hi, 1, 2, 7);
         }
 
         public void PutKoma(int o, Kind kind, int x, int y, int z) //owner, 駒の種類, x, y, z, 拡大縮小
         {
-            int k = kind_to_piece[kind]; //kindにあたる駒のpiecesにおける添え字番号を計算
+            int k = (int) kind; //kindにあたる駒のpiecesにおける添え字番号を計算
             koma3D[x, y, z] = Instantiate(pieces[k], this.transform);
             koma3D[x, y, z].transform.position = new Vector3(x, y - 0.5f, z);
             if (o == -1) koma3D[x, y, z].transform.eulerAngles = new Vector3(0, 180, 0);
