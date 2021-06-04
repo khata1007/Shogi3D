@@ -48,11 +48,7 @@ namespace PvP553.MakeKomaPrefs
             mesh.vertices = new Vector3[]
             {
                 //天板
-                positions[ 0],positions[ 1],positions[ 2],
-                positions[ 0],positions[ 2],positions[ 3],
-                positions[ 0],positions[ 3],positions[ 4],
-                positions[ 0],positions[ 4],positions[ 5],
-                positions[ 0],positions[ 5],positions[ 1],
+                positions[1],positions[2],positions[3],positions[4],positions[5]
                 /*
                 //底板
                 positions[ 6],positions[ 8],positions[ 7],
@@ -79,10 +75,22 @@ namespace PvP553.MakeKomaPrefs
                 */
             };
 
-            int[] triangles0 = new int[mesh.vertices.Length]; //駒の表面全体にマテリアルを設定
-            for (int i = 0; i < triangles0.Length; i++) triangles0[i] = i;
-            mesh.SetTriangles(triangles0, 0);
+            mesh.uv = new Vector2[]{
+                new Vector2(0.5f, 1.0f),
+                new Vector2(a*Mathf.Sin(P/2)/c + 0.5f, (0.5f*b-a*Mathf.Cos(P/2))/b + 0.5f),
+                new Vector2(1, 0),
+                new Vector2(0, 0),
+                new Vector2(-a*Mathf.Sin(P/2)/c + 0.5f, (0.5f*b-a*Mathf.Cos(P/2))/b + 0.5f),
+            };
 
+            //int[] triangles0 = new int[mesh.vertices.Length]; //駒の表面全体にマテリアルを設定
+            //for (int i = 0; i < triangles0.Length; i++) triangles0[i] = i;
+            //mesh.SetTriangles(triangles0, 0);
+            mesh.triangles = new int[]{
+                0, 1, 4,
+                1, 2, 4,
+                2, 3, 4,
+            };
             mesh.RecalculateNormals();
 
             var filter = GetComponent<MeshFilter>();

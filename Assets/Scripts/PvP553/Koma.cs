@@ -21,7 +21,7 @@ namespace PvP553
         private Transform pieces2DTransform;
         public GameObject[] pieces = new GameObject[22];
         public GameObject[] pieces2D = new GameObject[8];
-        public enum Kind { Emp, Fu, Kyo, Kei, Gin, Kak, Hi, Kin, Ou, Gyo, To, NariKyo, NariKei, NariGin, Uma, Ryu};
+        public enum Kind { Emp, Fu, Kyo, Kei, Gin, Kak, Hi, Kin, Ou, Gyo, To, NariKyo, NariKei, NariGin, Uma, Ryu };
 
         public static readonly int diff_nari = 9;
 
@@ -274,12 +274,13 @@ namespace PvP553
         {
             Transform pieces3DTransform = this.transform.GetChild(0).gameObject.transform;
             Transform pieces2DTransform = this.transform.GetChild(1).gameObject.transform;
-            int k = (int) kind; //kindにあたる駒のpiecesにおける添え字番号を計算
+            int k = (int)kind; //kindにあたる駒のpiecesにおける添え字番号を計算
             koma3D[x, y, z] = Instantiate(pieces[k], pieces3DTransform);
             koma3D[x, y, z].layer = koma3D[x, y, z].transform.parent.gameObject.layer;
             koma3D[x, y, z].transform.localPosition = new Vector3(x, y - 0.5f, z);
             if (o == -1) koma3D[x, y, z].transform.eulerAngles = new Vector3(0, 180, 0);
             koma3D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
+            koma3D[x, y, z].SetLayerRecursively(11);
 
             koma2D[x, y, z] = Instantiate(pieces2D[k], pieces2DTransform);
             koma2D[x, y, z].layer = koma2D[x, y, z].transform.parent.gameObject.layer;
@@ -289,11 +290,12 @@ namespace PvP553
             koma2D[x, y, z].SetActive(true);
 
             koma2D[x, y, z].transform.localScale = new Vector3(komaScale2D, komaScale2D, komaScale2D);
+            koma2D[x, y, z].SetLayerRecursively(10);
             boardstate[x, y, z] = (int)kind * o;
         }
 
         public int Nari(GameObject koma3D, GameObject koma2D)
-        { 
+        {
             Text targetText3D = koma3D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
 
             string kind = targetText3D.text;
@@ -308,7 +310,7 @@ namespace PvP553
             return komaName_to_kind[nari[kind]]; //正値を返すので手番に応じて呼び出し元で-1倍してね
         }
 
-       
+
         public static List<Vector3Int> getKomaMove(int k) { return komaMove[Math.Abs(k)]; }
         public GameObject GetKoma3D(int k) { return pieces[k]; }
         public GameObject GetKoma2D(int k) { return pieces2D[k]; }

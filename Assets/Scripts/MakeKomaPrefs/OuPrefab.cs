@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PvP993.MakeKomaPrefs
+namespace MakeKomaPrefs
 {
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(MeshFilter))]
 
-    public class KeiPrefab2D : MonoBehaviour
+    public class OuPrefab : MonoBehaviour
     {
         [SerializeField] private Material _mat;
 
@@ -15,10 +15,10 @@ namespace PvP993.MakeKomaPrefs
         void Start()
         {
             float[] sunpou = new float[3];
-            for (int i = 0; i < 3; i++) sunpou[i] = PvP993.Koma.sunpou[2, i];
+            for (int i = 0; i < 3; i++) sunpou[i] = Sunpou.sunpou[7, i];
 
             float[] degs = new float[3];
-            for (int i = 0; i < 3; i++) degs[i] = PvP993.Koma.deg[2, i];
+            for (int i = 0; i < 3; i++) degs[i] = Sunpou.deg[7, i];
 
             float c = sunpou[0], b = sunpou[1], d = sunpou[2];
             float P = Mathf.Deg2Rad * degs[0], R = Mathf.Deg2Rad * degs[1], Gamma = Mathf.Deg2Rad * degs[2];
@@ -30,20 +30,19 @@ namespace PvP993.MakeKomaPrefs
 
             Vector3[] positions = new Vector3[]
             {
-                new Vector3(0f, 0, 0f),
-                new Vector3(0f, 0, 0.5f*b),
-                new Vector3(a*Mathf.Sin(P/2), 0, 0.5f*b-a*Mathf.Cos(P/2)),
-                new Vector3(c/2, 0, -0.5f*b),
-                new Vector3(-c/2, 0, -0.5f*b),
-                new Vector3(-a*Mathf.Sin(P/2), 0, 0.5f*b-a*Mathf.Cos(P/2)),
-                /*
+                new Vector3(0f, h, 0f),
+                new Vector3(0f, h-id, 0.5f*b),
+                new Vector3(a*Mathf.Sin(P/2), h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma), 0.5f*b-a*Mathf.Cos(P/2)),
+                new Vector3(c/2, h+id, -0.5f*b),
+                new Vector3(-c/2, h+id, -0.5f*b),
+                new Vector3(-a*Mathf.Sin(P/2), h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma), 0.5f*b-a*Mathf.Cos(P/2)),
+
                 new Vector3(0f, -h, 0f),
                 new Vector3(0f, -(h-id), 0.5f*b),
                 new Vector3(a*Mathf.Sin(P/2), -(h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma)), 0.5f*b-a*Mathf.Cos(P/2)),
                 new Vector3(c/2, -(h+id), -0.5f*b),
                 new Vector3(-c/2, -(h+id), -0.5f*b),
                 new Vector3(-a*Mathf.Sin(P/2), -(h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma)), 0.5f*b-a*Mathf.Cos(P/2)),
-                */
             };
             mesh.vertices = new Vector3[]
             {
@@ -53,7 +52,7 @@ namespace PvP993.MakeKomaPrefs
                 positions[ 0],positions[ 3],positions[ 4],
                 positions[ 0],positions[ 4],positions[ 5],
                 positions[ 0],positions[ 5],positions[ 1],
-                /*
+
                 //底板
                 positions[ 6],positions[ 8],positions[ 7],
                 positions[ 6],positions[ 9],positions[ 8],
@@ -76,7 +75,6 @@ namespace PvP993.MakeKomaPrefs
 
                 positions[ 1],positions[ 5],positions[11],
                 positions[ 1],positions[11],positions[ 7],
-                */
             };
 
             int[] triangles0 = new int[mesh.vertices.Length]; //駒の表面全体にマテリアルを設定

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PvP993.MakeKomaPrefs
+namespace MakeKomaPrefs
 {
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(MeshFilter))]
 
-    public class KinPrefab2D : MonoBehaviour
+    public class KakuPrefab2D : MonoBehaviour
     {
         [SerializeField] private Material _mat;
 
@@ -15,10 +15,10 @@ namespace PvP993.MakeKomaPrefs
         void Start()
         {
             float[] sunpou = new float[3];
-            for (int i = 0; i < 3; i++) sunpou[i] = PvP993.Koma.sunpou[4, i];
+            for (int i = 0; i < 3; i++) sunpou[i] = Sunpou.sunpou[5, i];
 
             float[] degs = new float[3];
-            for (int i = 0; i < 3; i++) degs[i] = PvP993.Koma.deg[4, i];
+            for (int i = 0; i < 3; i++) degs[i] = Sunpou.deg[5, i];
 
             float c = sunpou[0], b = sunpou[1], d = sunpou[2];
             float P = Mathf.Deg2Rad * degs[0], R = Mathf.Deg2Rad * degs[1], Gamma = Mathf.Deg2Rad * degs[2];

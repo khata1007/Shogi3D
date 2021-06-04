@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PvP993.MakeKomaPrefs
+namespace MakeKomaPrefs
 {
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(MeshFilter))]
 
-    public class FuPrefab2D : MonoBehaviour
+    public class GyokuPrefab2D : MonoBehaviour
     {
         [SerializeField] private Material _mat;
 
@@ -15,10 +15,10 @@ namespace PvP993.MakeKomaPrefs
         void Start()
         {
             float[] sunpou = new float[3];
-            for (int i = 0; i < 3; i++) sunpou[i] = PvP993.Koma.sunpou[0,i];
+            for (int i = 0; i < 3; i++) sunpou[i] = Sunpou.sunpou[8, i];
 
             float[] degs = new float[3];
-            for (int i = 0; i < 3; i++) degs[i] = PvP993.Koma.deg[0,i];
+            for (int i = 0; i < 3; i++) degs[i] = Sunpou.deg[8, i];
 
             float c = sunpou[0], b = sunpou[1], d = sunpou[2];
             float P = Mathf.Deg2Rad * degs[0], R = Mathf.Deg2Rad * degs[1], Gamma = Mathf.Deg2Rad * degs[2];
@@ -28,7 +28,6 @@ namespace PvP993.MakeKomaPrefs
 
             Mesh mesh = new Mesh();
 
-            
             Vector3[] positions = new Vector3[]
             {
                 new Vector3(0f, 0, 0f),
@@ -46,25 +45,6 @@ namespace PvP993.MakeKomaPrefs
                 new Vector3(-a*Mathf.Sin(P/2), -(h-id+a*Mathf.Cos(P/2)/Mathf.Tan(Gamma)), 0.5f*b-a*Mathf.Cos(P/2)),
                 */
             };
-            /*
-            float eps = 0.01f;
-            Vector3[] positions = new Vector3[]
-            {
-                new Vector3(0f, eps, 0f),
-                new Vector3(0f, eps, 0.5f*b),
-                new Vector3(a*Mathf.Sin(P/2), eps, 0.5f*b-a*Mathf.Cos(P/2)),
-                new Vector3(c/2, eps, -0.5f*b),
-                new Vector3(-c/2, eps, -0.5f*b),
-                new Vector3(-a*Mathf.Sin(P/2), eps, 0.5f*b-a*Mathf.Cos(P/2)),
-
-                new Vector3(0f, -eps, 0f),
-                new Vector3(0f, -eps, 0.5f*b),
-                new Vector3(a*Mathf.Sin(P/2), -eps, 0.5f*b-a*Mathf.Cos(P/2)),
-                new Vector3(c/2, -eps, -0.5f*b),
-                new Vector3(-c/2, -eps, -0.5f*b),
-                new Vector3(-a*Mathf.Sin(P/2), -eps, 0.5f*b-a*Mathf.Cos(P/2)),
-            };
-            */
             mesh.vertices = new Vector3[]
             {
                 //天板

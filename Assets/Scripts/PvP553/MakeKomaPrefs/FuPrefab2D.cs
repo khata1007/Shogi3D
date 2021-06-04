@@ -15,10 +15,10 @@ namespace PvP553.MakeKomaPrefs
         void Start()
         {
             float[] sunpou = new float[3];
-            for (int i = 0; i < 3; i++) sunpou[i] = PvP553.Koma.sunpou[0,i];
+            for (int i = 0; i < 3; i++) sunpou[i] = PvP553.Koma.sunpou[0, i];
 
             float[] degs = new float[3];
-            for (int i = 0; i < 3; i++) degs[i] = PvP553.Koma.deg[0,i];
+            for (int i = 0; i < 3; i++) degs[i] = PvP553.Koma.deg[0, i];
 
             float c = sunpou[0], b = sunpou[1], d = sunpou[2];
             float P = Mathf.Deg2Rad * degs[0], R = Mathf.Deg2Rad * degs[1], Gamma = Mathf.Deg2Rad * degs[2];
@@ -28,7 +28,7 @@ namespace PvP553.MakeKomaPrefs
 
             Mesh mesh = new Mesh();
 
-            
+
             Vector3[] positions = new Vector3[]
             {
                 new Vector3(0f, 0, 0f),
@@ -68,11 +68,7 @@ namespace PvP553.MakeKomaPrefs
             mesh.vertices = new Vector3[]
             {
                 //天板
-                positions[ 0],positions[ 1],positions[ 2],
-                positions[ 0],positions[ 2],positions[ 3],
-                positions[ 0],positions[ 3],positions[ 4],
-                positions[ 0],positions[ 4],positions[ 5],
-                positions[ 0],positions[ 5],positions[ 1],
+                positions[1],positions[2],positions[3],positions[4],positions[5]
                 /*
                 //底板
                 positions[ 6],positions[ 8],positions[ 7],
@@ -99,10 +95,22 @@ namespace PvP553.MakeKomaPrefs
                 */
             };
 
-            int[] triangles0 = new int[mesh.vertices.Length]; //駒の表面全体にマテリアルを設定
-            for (int i = 0; i < triangles0.Length; i++) triangles0[i] = i;
-            mesh.SetTriangles(triangles0, 0);
+            mesh.uv = new Vector2[]{
+                new Vector2(0.5f, 1.0f),
+                new Vector2(a*Mathf.Sin(P/2)/c + 0.5f, (0.5f*b-a*Mathf.Cos(P/2))/b + 0.5f),
+                new Vector2(1, 0),
+                new Vector2(0, 0),
+                new Vector2(-a*Mathf.Sin(P/2)/c + 0.5f, (0.5f*b-a*Mathf.Cos(P/2))/b + 0.5f),
+            };
 
+            //int[] triangles0 = new int[mesh.vertices.Length]; //駒の表面全体にマテリアルを設定
+            //for (int i = 0; i < triangles0.Length; i++) triangles0[i] = i;
+            //mesh.SetTriangles(triangles0, 0);
+            mesh.triangles = new int[]{
+                0, 1, 4,
+                1, 2, 4,
+                2, 3, 4,
+            };
             mesh.RecalculateNormals();
 
             var filter = GetComponent<MeshFilter>();
