@@ -76,7 +76,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u738B\n\u5C06"
+  m_Text: 
 --- !u!1 &3480771325742267746
 GameObject:
   m_ObjectHideFlags: 0
@@ -229,7 +229,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d037beea9b0de0c46b6f80e5a7425c73, type: 2}
+  - {fileID: 2100000, guid: 4e71868e0c0cd9046b2cfc8b76e2c053, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -270,7 +270,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbd8cf038a0080e45899b23299af3234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mat: {fileID: 2100000, guid: 9d76029ceb7ae28418f6db58a43104ed, type: 2}
+  _mat:
+  - {fileID: 2100000, guid: 4e71868e0c0cd9046b2cfc8b76e2c053, type: 2}
+  - {fileID: 2100000, guid: 4e71868e0c0cd9046b2cfc8b76e2c053, type: 2}
 --- !u!1 &3480771326093889211
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,4 +349,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u738B\n\u5C06"
+  m_Text: 

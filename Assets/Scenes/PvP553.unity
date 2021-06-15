@@ -449,7 +449,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 339380770}
+  m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
@@ -1989,44 +1989,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pieces:
   - {fileID: 0}
-  - {fileID: 261167067914147737, guid: a91fab811f9860c4dad21ab6473f08da, type: 3}
-  - {fileID: 8420286189583206713, guid: 03494765843a3154ebaa28d7cccc51ba, type: 3}
-  - {fileID: 3289634703687475747, guid: f322a87e7480437498bf94160fc3b385, type: 3}
-  - {fileID: 1441120877840310820, guid: b04dcd11c37cfb54285ef1c2d5808c7f, type: 3}
-  - {fileID: 1668448952932814677, guid: b4058da6d1e395345ad3609b76499f77, type: 3}
-  - {fileID: 6486535498921194889, guid: f5e6347f1ea5d8b4dadd5490170ea9e2, type: 3}
-  - {fileID: 4937577689878531372, guid: a0491ebb30cfa704691b5b0fab5398ea, type: 3}
-  - {fileID: 3480771325851827464, guid: 30fc518cc0eba9d40969b52aa6aafc74, type: 3}
-  - {fileID: 5662828523288844142, guid: 914b8387196071841b4e1b46bafc7f46, type: 3}
-  - {fileID: 1780495993824830195, guid: 7637c571735a2044db2b8018b6c18b8c, type: 3}
-  - {fileID: 723476332540063330, guid: 807b9ea4976feb34da0c817952ce873e, type: 3}
-  - {fileID: 9087194920447514220, guid: 6126cb91e22e8ef4fab008087fa9336d, type: 3}
-  - {fileID: 8820565378935638598, guid: 11ef0155a8393aa42aec042123f88ab2, type: 3}
-  - {fileID: 7069183481166020478, guid: b9fb3d299c923434eafd20fefa650ee2, type: 3}
-  - {fileID: 3164494336624773979, guid: df3f075a54d19c54b969bb11569dae2e, type: 3}
-  - {fileID: 254425390358896159, guid: c6a2348279cdb9e47a6bb7eca2895d30, type: 3}
-  - {fileID: 8102808617904616577, guid: 5c8d12a05aab5ef499881a4967641640, type: 3}
-  - {fileID: 7931157451231042923, guid: 4f3536b7528948e428c01a69d8116d00, type: 3}
-  - {fileID: 7188908914359164444, guid: a90b6bd10717b74418a2667ca44b7907, type: 3}
-  - {fileID: 1803957801034729959, guid: 89b0ee99863c34a4b9abfb0a2eae531f, type: 3}
-  - {fileID: 7560163630664421008, guid: 60d97b889fb2f3149856b3da0217d155, type: 3}
-  - {fileID: 8678123988991059354, guid: 72dba85b2033c6c49af95c3233e7dc31, type: 3}
-  - {fileID: 5435955470572847791, guid: 5fbe7ea14d8cf0a469e502bb5ad799a6, type: 3}
-  - {fileID: 5777205689404032, guid: 83ae01e49bb5869498ea1a0510f572ef, type: 3}
-  - {fileID: 5006473690535687783, guid: 5371328154a607b44b3855ea2f56e4fa, type: 3}
-  - {fileID: 1920282420081758100, guid: d813660e46d32294eaeed666808f7639, type: 3}
-  - {fileID: 173242694315547156, guid: 70bfe261a47f0dd40bf11c0c9b714e90, type: 3}
+  - {fileID: 2021421069352428954, guid: a91fab811f9860c4dad21ab6473f08da, type: 3}
+  - {fileID: 8420286189583206712, guid: 03494765843a3154ebaa28d7cccc51ba, type: 3}
+  - {fileID: 3289634703687475746, guid: f322a87e7480437498bf94160fc3b385, type: 3}
+  - {fileID: 1441120877840310821, guid: b04dcd11c37cfb54285ef1c2d5808c7f, type: 3}
+  - {fileID: 1668448952932814676, guid: b4058da6d1e395345ad3609b76499f77, type: 3}
+  - {fileID: 1281127358477465218, guid: f5e6347f1ea5d8b4dadd5490170ea9e2, type: 3}
+  - {fileID: 4937577689693393416, guid: a0491ebb30cfa704691b5b0fab5398ea, type: 3}
+  - {fileID: 3484283365629769590, guid: 30fc518cc0eba9d40969b52aa6aafc74, type: 3}
+  - {fileID: -2768425062220800185, guid: 914b8387196071841b4e1b46bafc7f46, type: 3}
   pieces2D:
   - {fileID: 0}
-  - {fileID: 4298913978611933791, guid: 3d34373102ed62b4eb833168b3208622, type: 3}
-  - {fileID: 7564872549698763020, guid: 3a2cc2d2b7fa6db4cab5b9f35a51ee5e, type: 3}
-  - {fileID: 1528221488091458285, guid: eae0362f7f1476b4f8d163c177ed4dd0, type: 3}
-  - {fileID: 7874462313804605965, guid: 2ffa3b39f99060a4c818141dc52a7756, type: 3}
-  - {fileID: 687132248436700792, guid: b952d0dbf0c9aa848a2f0f10e943c0f8, type: 3}
-  - {fileID: 2954983880021445759, guid: dbad5640d8f8f024fa4f560d88383213, type: 3}
-  - {fileID: 3851595612979007383, guid: 1a24599cf0ba29b4fa926f270d0d416b, type: 3}
-  - {fileID: 7441580773932860072, guid: 4b6c7bbb3b1261c4484ac765dbc761a2, type: 3}
-  - {fileID: 3618961354604346451, guid: d87edcf3b263a7b4c978e03629322c55, type: 3}
+  - {fileID: -2484804659395555529, guid: 3d34373102ed62b4eb833168b3208622, type: 3}
+  - {fileID: -8279732569261415338, guid: 3a2cc2d2b7fa6db4cab5b9f35a51ee5e, type: 3}
+  - {fileID: 2373129300220322348, guid: eae0362f7f1476b4f8d163c177ed4dd0, type: 3}
+  - {fileID: 7057033766993968985, guid: 2ffa3b39f99060a4c818141dc52a7756, type: 3}
+  - {fileID: -6803845571577805819, guid: b952d0dbf0c9aa848a2f0f10e943c0f8, type: 3}
+  - {fileID: 5974966947556686034, guid: dbad5640d8f8f024fa4f560d88383213, type: 3}
+  - {fileID: -3040495553325909091, guid: 1a24599cf0ba29b4fa926f270d0d416b, type: 3}
+  - {fileID: -4022115138495518978, guid: 4b6c7bbb3b1261c4484ac765dbc761a2, type: 3}
+  - {fileID: -8316780795962944246, guid: d87edcf3b263a7b4c978e03629322c55, type: 3}
 --- !u!4 &1137788832
 Transform:
   m_ObjectHideFlags: 0
@@ -2794,7 +2776,7 @@ MonoBehaviour:
   scale3D: 1.1
   koma: {fileID: 1137788831}
   board: {fileID: 632788029}
-  camera: {fileID: 963194229}
+  cameraMover: {fileID: 0}
   nariConfirmCanvas: {fileID: 1006778687}
   opponentMochigomaObj: {fileID: 846734079}
   myMochigomaObj: {fileID: 2055364765}
@@ -2942,7 +2924,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 1770679281}
+  m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:

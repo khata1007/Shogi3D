@@ -24,7 +24,7 @@ namespace PvP553
 
         public Koma koma;
         public Board board;
-        public CameraMover camera;
+        public CameraMover cameraMover;
         public GameObject nariConfirmCanvas;
         public GameObject opponentMochigomaObj;
         public GameObject myMochigomaObj;
@@ -54,8 +54,8 @@ namespace PvP553
         private GameObject[,,] movableGrid2D;
 
         //盤上の駒
-        private GameObject[,,] koma_on_board3D; //実際の駒への参照配列
-        private GameObject[,,] koma_on_board2D;
+        private MakeKomaPrefs.KomaPrefab[,,] koma_on_board3D; //実際の駒への参照配列
+        private MakeKomaPrefs.KomaPrefab2D[,,] koma_on_board2D;
         private int[,,] boardstate;
         private Button[,,] gridButton2D;
         private Button chooseResetButton2D;
@@ -63,11 +63,11 @@ namespace PvP553
         private int[,,] opReachablePieces; //敵の駒で[x, y, z]に到達可能な盤上の駒の数
 
         //持ち駒
-        private List<GameObject> myMochigomaInstance;
+        private List<MakeKomaPrefs.KomaPrefab2D> myMochigomaInstance;
         private List<int> myMochigomaIdx; //e.g. 持ち駒が歩と桂馬 -> {1, 3}
         private List<Button> myMochigomaButton;
         private List<GameObject> myMochigomaBox;
-        private List<GameObject> opMochigomaInstance;
+        private List<MakeKomaPrefs.KomaPrefab2D> opMochigomaInstance;
         private List<int> opMochigomaIdx;
         private List<Button> opMochigomaButton;
         private List<GameObject> opMochigomaBox;
@@ -106,8 +106,8 @@ namespace PvP553
             frameX2D = new GameObject[yLength, zLength + 1];
             frameZ2D = new GameObject[yLength, xLength + 1];
 
-            koma_on_board3D = new GameObject[xLength, yLength, zLength];
-            koma_on_board2D = new GameObject[xLength, yLength, zLength];
+            koma_on_board3D = new MakeKomaPrefs.KomaPrefab[xLength, yLength, zLength];
+            koma_on_board2D = new MakeKomaPrefs.KomaPrefab2D[xLength, yLength, zLength];
 
             movableGrid3D = new GameObject[xLength, yLength, zLength];
             movableGrid2D = new GameObject[xLength, yLength, zLength];
@@ -117,11 +117,11 @@ namespace PvP553
             opReachablePieces = new int[xLength, yLength, zLength];
 
             int piecenum = 40; //持ち駒になり得る駒は高々40枚
-            myMochigomaInstance = new List<GameObject>(piecenum);
+            myMochigomaInstance = new List<MakeKomaPrefs.KomaPrefab2D>(piecenum);
             myMochigomaIdx = new List<int>(piecenum);
             myMochigomaButton = new List<Button>(piecenum);
             myMochigomaBox = new List<GameObject>(piecenum);
-            opMochigomaInstance = new List<GameObject>(piecenum);
+            opMochigomaInstance = new List<MakeKomaPrefs.KomaPrefab2D>(piecenum);
             opMochigomaIdx = new List<int>(piecenum);
             opMochigomaButton = new List<Button>(piecenum);
             opMochigomaBox = new List<GameObject>(piecenum);
@@ -224,8 +224,8 @@ namespace PvP553
 
                     if (turn == 1) koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(myMochigomaIdx[choose])), pushx, pushy, pushz);
                     else koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(opMochigomaIdx[choose])), pushx, pushy, pushz);
-                    koma_on_board2D[pushx, pushy, pushz].SetActive(true);
-                    koma_on_board3D[pushx, pushy, pushz].SetActive(true);
+                    koma_on_board2D[pushx, pushy, pushz].gameObject.SetActive(true);
+                    koma_on_board3D[pushx, pushy, pushz].gameObject.SetActive(true);
                     MochigomaRemove(choose);
                     UnActivateChoosingGrid();
                 }
@@ -251,8 +251,8 @@ namespace PvP553
                     if (boardstate[pushx, pushy, pushz] != 0) //相手の駒が置かれている場所に移動する場合
                     {
                         MochigomaGenerate(Math.Abs(boardstate[pushx, pushy, pushz]));
-                        Destroy(koma_on_board3D[pushx, pushy, pushz]);
-                        Destroy(koma_on_board2D[pushx, pushy, pushz]);
+                        Destroy(koma_on_board3D[pushx, pushy, pushz].gameObject);
+                        Destroy(koma_on_board2D[pushx, pushy, pushz].gameObject);
                     }
 
                     int dx = pushx - fromx, dy = pushy - fromy, dz = pushz - fromz;
@@ -388,15 +388,15 @@ namespace PvP553
 
 
             is3D = !is3D;
-            camera.CameraMovable = !camera.CameraMovable;
+            cameraMover.CameraMovable = !cameraMover.CameraMovable;
             for (int x = 0; x < xLength; x++)
             {
                 for (int y = 0; y < yLength; y++)
                 {
                     for (int z = 0; z < zLength; z++)
                     {
-                        if (koma_on_board3D[x, y, z] != null) koma_on_board3D[x, y, z].SetActive(!koma_on_board3D[x, y, z].activeSelf);
-                        if (koma_on_board2D[x, y, z] != null) koma_on_board2D[x, y, z].SetActive(!koma_on_board2D[x, y, z].activeSelf);
+                        if (koma_on_board3D[x, y, z] != null) koma_on_board3D[x, y, z].gameObject.SetActive(!koma_on_board3D[x, y, z].gameObject.activeSelf);
+                        if (koma_on_board2D[x, y, z] != null) koma_on_board2D[x, y, z].gameObject.SetActive(!koma_on_board2D[x, y, z].gameObject.activeSelf);
                     }
                 }
             }
@@ -421,10 +421,10 @@ namespace PvP553
             if (frameZ2D[0, 0].activeSelf) //2Dモードに切り替えた場合はカメラを固定
             {
                 float c = 4.5f;
-                prevCameraPos = camera.MainCameraTransformPosition;
-                camera.MainCamera2DSetting(new Vector3(c, 12, c), new Vector3(c, 0, c));
+                prevCameraPos = cameraMover.MainCameraTransformPosition;
+                cameraMover.MainCamera2DSetting(new Vector3(c, 12, c), new Vector3(c, 0, c));
             }
-            else camera.MainCameraTransformPosition = prevCameraPos;
+            else cameraMover.MainCameraTransformPosition = prevCameraPos;
 
             //3Dと2DのorangeBox, greenBox, movableGridのactiveを（必要なら）入れ替える
             for (int x = 0; x < xLength; x++)
@@ -642,7 +642,7 @@ namespace PvP553
             return false;
         }
 
-        private void ChooseMochigoma(GameObject komainst, int idx) //idx: 相手の桂馬なら-3, 自分の歩なら1
+        private void ChooseMochigoma(MakeKomaPrefs.KomaPrefab2D komainst, int idx) //idx: 相手の桂馬なら-3, 自分の歩なら1
         {
             if (!mouseDetectable) return;
             if (komainst.transform.GetChild(0).transform.GetChild(2).gameObject.activeSelf)
@@ -675,10 +675,10 @@ namespace PvP553
         {
             //持ち駒のインスタンスやボタン, オレンジのタイル等の設定
             if (kind >= (int)Koma.Kind.To) kind -= Koma.diff_nari;
-            GameObject p = koma.GetKoma2D(kind);
-            GameObject g;
-            if (turn == 1) g = Instantiate(p, myMochigomaObj.transform);
-            else g = Instantiate(p, opponentMochigomaObj.transform);
+            MakeKomaPrefs.KomaPrefab2D p = koma.GetKoma2D(kind);
+            MakeKomaPrefs.KomaPrefab2D g;
+            if (turn == 1) g = Instantiate<MakeKomaPrefs.KomaPrefab2D>(p, myMochigomaObj.transform);
+            else g = Instantiate<MakeKomaPrefs.KomaPrefab2D>(p, opponentMochigomaObj.transform);
             g.transform.localPosition = new Vector3(-10 * turn, 0, 0);
 
             Transform canv = g.transform.GetChild(0).transform;
@@ -695,8 +695,8 @@ namespace PvP553
             box.transform.localScale = new Vector3(1, 1, 0.01f);
             box.SetActive(false);
 
-            if (turn == 1) g.SetLayerRecursively(8);
-            else g.SetLayerRecursively(9);
+            if (turn == 1) g.gameObject.SetLayerRecursively(8);
+            else g.gameObject.SetLayerRecursively(9);
 
 
             if (turn == 1)
@@ -729,7 +729,7 @@ namespace PvP553
                     {
                         Debug.Log(i);
                         //Vector3 pos = myMochigomaInstance[i + 1].transform.localPosition; //例えば銀がi, 桂馬がi+1のとき: まずは桂馬の位置を記録
-                        GameObject inst = myMochigomaInstance[i + 1]; //桂馬のインスタンスも記憶
+                        MakeKomaPrefs.KomaPrefab2D inst = myMochigomaInstance[i + 1]; //桂馬のインスタンスも記憶
                         int idx = myMochigomaIdx[i + 1];
                         Button bt = myMochigomaButton[i + 1];
                         GameObject bx = myMochigomaBox[i + 1];
@@ -760,7 +760,7 @@ namespace PvP553
                     for (int i = opMochigomaIdx.Count - 2; i >= ins; i--)
                     {
                         Vector3 pos = opMochigomaInstance[i + 1].transform.localPosition;
-                        GameObject inst = opMochigomaInstance[i + 1];
+                        MakeKomaPrefs.KomaPrefab2D inst = opMochigomaInstance[i + 1];
                         int idx = opMochigomaIdx[i + 1];
                         Button bt = opMochigomaButton[i + 1];
                         GameObject bx = opMochigomaBox[i + 1];
@@ -793,7 +793,7 @@ namespace PvP553
                 myMochigomaBox.RemoveAt(idx);
                 myMochigomaButton.RemoveAt(idx);
                 myMochigomaIdx.RemoveAt(idx);
-                Destroy(myMochigomaInstance[idx]);
+                Destroy(myMochigomaInstance[idx].gameObject);
                 myMochigomaInstance.RemoveAt(idx);
             }
             else
@@ -802,7 +802,7 @@ namespace PvP553
                 opMochigomaBox.RemoveAt(idx);
                 opMochigomaButton.RemoveAt(idx);
                 opMochigomaIdx.RemoveAt(idx);
-                Destroy(opMochigomaInstance[idx]);
+                Destroy(opMochigomaInstance[idx].gameObject);
                 opMochigomaInstance.RemoveAt(idx);
             }
 
@@ -819,7 +819,7 @@ namespace PvP553
                 else newScale = 1.0f;
                 Vector3 pos = new Vector3(-10, 0, 0);
                 Vector3 inc = new Vector3(newScale, 0, 0);
-                foreach (GameObject inst in myMochigomaInstance)
+                foreach (MakeKomaPrefs.KomaPrefab2D inst in myMochigomaInstance)
                 {
                     inst.transform.localScale = new Vector3(newScale, newScale, newScale);
                     inst.transform.localPosition = pos;
@@ -832,7 +832,7 @@ namespace PvP553
                 else newScale = 1.0f;
                 Vector3 pos = new Vector3(10, 0, 0);
                 Vector3 inc = new Vector3(-newScale, 0, 0);
-                foreach (GameObject inst in opMochigomaInstance)
+                foreach (MakeKomaPrefs.KomaPrefab2D inst in opMochigomaInstance)
                 {
                     inst.transform.localScale = new Vector3(newScale, newScale, newScale);
                     inst.transform.localPosition = pos;
@@ -1175,7 +1175,7 @@ namespace PvP553
 
         public void ReverseView()
         {
-            //camera.transform.eulerAngles += new Vector3(0, 180, 0);
+            //cameraMover.transform.eulerAngles += new Vector3(0, 180, 0);
         }
 
         public void UnActivateChoosingGrid()

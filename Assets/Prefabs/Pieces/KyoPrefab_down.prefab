@@ -76,7 +76,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u9999\n\u8ECA"
+  m_Text: 
 --- !u!1 &8420286189583206713
 GameObject:
   m_ObjectHideFlags: 0
@@ -129,7 +129,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d037beea9b0de0c46b6f80e5a7425c73, type: 2}
+  - {fileID: 2100000, guid: 3ea7e9b8370c31f47813a50522e7c872, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -170,7 +170,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d6e444869d38254cbfa54be6e2b76e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mat: {fileID: 2100000, guid: 9d76029ceb7ae28418f6db58a43104ed, type: 2}
+  _mat:
+  - {fileID: 2100000, guid: 3ea7e9b8370c31f47813a50522e7c872, type: 2}
+  - {fileID: 2100000, guid: 60a54f4007c4a88429c625394f6c5cc1, type: 2}
 --- !u!1 &8420286190028376403
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,4 +349,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u9999\n\u8ECA"
+  m_Text: 

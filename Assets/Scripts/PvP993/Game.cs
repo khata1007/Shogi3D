@@ -20,10 +20,10 @@ namespace PvP993
 
         [SerializeField, Range(0.7f, 1.3f)] private float scale2D = 1.0f;
 
-        
+
         public Koma koma;
         public Board board;
-        public CameraMover camera;
+        public CameraMover cameraMover;
         public GameObject nariConfirmCanvas;
         public GameObject opponentMochigomaObj;
         public GameObject myMochigomaObj;
@@ -126,7 +126,7 @@ namespace PvP993
 
             rule = new RuleManager(boardstate);
 
-            
+
             //領域確保した段階で配列の参照をKomaクラスの方にも渡す. 確保前に渡すとPutKomaでぬるぽ吐く. どうして...
             koma.Boardstate = boardstate;
             koma.Koma3D = koma_on_board3D;
@@ -138,9 +138,9 @@ namespace PvP993
             //koma_on_Board3D/2Dをnullで初期化
             for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         koma_on_board3D[x, y, z] = null;
                         koma_on_board2D[x, y, z] = null;
@@ -152,14 +152,14 @@ namespace PvP993
 
             koma.InitialSet(); //初期配置
 
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         if (boardstate[x, y, z] > 0) CalcReachableRange();
-                        else if(boardstate[x, y, z] < 0) CalcReachableRange();
+                        else if (boardstate[x, y, z] < 0) CalcReachableRange();
                     }
                 }
             }
@@ -176,14 +176,14 @@ namespace PvP993
             Debug.Log(rule.getVal(0, 0, 0));
             */
             Vector3Int temp = myOuPos;
-            
-            
+
+
         }
 
         // Update is called once per frame
         void Update()
         {
-            
+
         }
 
         public async void ChooseGrid(int idx) //実際に手番が進むメソッド 作業のしやすさを考慮してUpdate()直下に配置
@@ -260,13 +260,13 @@ namespace PvP993
                     koma_on_board3D[fromx, fromy, fromz] = null;
                     koma_on_board2D[pushx, pushy, pushz] = koma_on_board2D[fromx, fromy, fromz];
                     koma_on_board2D[fromx, fromy, fromz] = null;
-                    
+
                     boardstate[pushx, pushy, pushz] = boardstate[fromx, fromy, fromz];
                     boardstate[fromx, fromy, fromz] = 0;
                     UnActivateChoosingGrid();
 
                     //王を動かしてるかどうかチェック
-                    if(8 <= Math.Abs(boardstate[pushx, pushy, pushz]) && Math.Abs(boardstate[pushx, pushy, pushz]) <= 9)
+                    if (8 <= Math.Abs(boardstate[pushx, pushy, pushz]) && Math.Abs(boardstate[pushx, pushy, pushz]) <= 9)
                     {
                         if (turn == 1) myOuPos = new Vector3Int(pushx, pushy, pushz);
                         else opOuPos = new Vector3Int(pushx, pushy, pushz);
@@ -327,25 +327,25 @@ namespace PvP993
         private void CalcReachableRange(int[,,] work = null) //workで与えた盤面における盤上の駒の到達範囲を計算 何も与えなければboardstateについて計算
         {
             if (work == null) work = boardstate;
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         myReachablePieces[x, y, z] = 0;
                         opReachablePieces[x, y, z] = 0;
                     }
                 }
             }
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         Vector3Int now = new Vector3Int(x, y, z);
-                        if(work[x, y, z] > 0)
+                        if (work[x, y, z] > 0)
                         {
                             List<Vector3Int> komaMoveList = Koma.getKomaMove(work[x, y, z]);
                             foreach (Vector3Int komaMove in komaMoveList)
@@ -355,7 +355,7 @@ namespace PvP993
                                 else if (work[x, y, z] != 3 && CheckBound(next) && CheckMovable(work, now, next)) myReachablePieces[next.x, next.y, next.z]++;
                             }
                         }
-                        else if(work[x, y, z] < 0)
+                        else if (work[x, y, z] < 0)
                         {
                             List<Vector3Int> komaMoveList = Koma.getKomaMove(work[x, y, z]);
                             foreach (Vector3Int komaMove in komaMoveList)
@@ -373,12 +373,12 @@ namespace PvP993
         public void ChangeDimension()
         {
             is3D = !is3D;
-            camera.CameraMovable = !camera.CameraMovable;
-            for(int x = 0; x < xLength; x++)
+            cameraMover.CameraMovable = !cameraMover.CameraMovable;
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         if (koma_on_board3D[x, y, z] != null) koma_on_board3D[x, y, z].SetActive(!koma_on_board3D[x, y, z].activeSelf);
                         if (koma_on_board2D[x, y, z] != null) koma_on_board2D[x, y, z].SetActive(!koma_on_board2D[x, y, z].activeSelf);
@@ -386,9 +386,9 @@ namespace PvP993
                 }
             }
 
-            for(int y = 0; y < yLength; y++)
+            for (int y = 0; y < yLength; y++)
             {
-                for(int z = 0; z <= zLength; z++)
+                for (int z = 0; z <= zLength; z++)
                 {
                     frameX3D[y, z].SetActive(!frameX3D[y, z].activeSelf);
                     frameX2D[y, z].SetActive(!frameX2D[y, z].activeSelf);
@@ -406,10 +406,10 @@ namespace PvP993
             if (frameZ2D[0, 0].activeSelf) //2Dモードに切り替えた場合はカメラを固定
             {
                 float c = 4.5f;
-                prevCameraPos = camera.MainCameraTransformPosition;
-                camera.MainCamera2DSetting(new Vector3(c, 12, c), new Vector3(c, 0, c));
+                prevCameraPos = cameraMover.MainCameraTransformPosition;
+                cameraMover.MainCamera2DSetting(new Vector3(c, 12, c), new Vector3(c, 0, c));
             }
-            else camera.MainCameraTransformPosition = prevCameraPos;
+            else cameraMover.MainCameraTransformPosition = prevCameraPos;
 
             //3Dと2DのorangeBox, greenBox, movableGridのactiveを（必要なら）入れ替える
             for (int x = 0; x < xLength; x++)
@@ -421,7 +421,7 @@ namespace PvP993
                         bool active3D, active2D;
                         active3D = orangeBox3D[x, y, z].activeSelf;
                         active2D = orangeBox2D[x, y, z].activeSelf;
-                        if(active3D & !active2D)
+                        if (active3D & !active2D)
                         {
                             orangeBox2D[x, y, z].SetActive(true);
                             orangeBox3D[x, y, z].SetActive(false);
@@ -458,17 +458,17 @@ namespace PvP993
                             movableGrid3D[x, y, z].SetActive(true);
                         }
 
-                        
+
                     }
                 }
             }
 
             //gridButton の enabled を入れ替える
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         gridButton2D[x, y, z].enabled = !gridButton2D[x, y, z].enabled;
                     }
@@ -501,11 +501,11 @@ namespace PvP993
         {
             bool ret = true;
             int[,,] work = new int[xLength, yLength, zLength];
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         work[x, y, z] = boardstate[x, y, z];
                     }
@@ -524,9 +524,9 @@ namespace PvP993
             }
             Debug.Log(k + " from " + new Vector3Int(from.x, from.y, from.z) + " to " + new Vector3Int(to.x, to.y, to.z));
             CalcReachableRange(work);
-            if(from.x == -1)
+            if (from.x == -1)
             {
-                if(Math.Abs(k) == 1 && CheckTsumi())
+                if (Math.Abs(k) == 1 && CheckTsumi())
                 {
                     Debug.Log("打歩詰めです");
                     ret = false;
@@ -635,14 +635,14 @@ namespace PvP993
                 return;
             }
             UnActivateChoosingGrid();
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         if ((idx == -3 && z <= 1) || (idx == 3 && z >= 7)) continue; //桂馬
-                        else if(boardstate[x, y, z] == 0)
+                        else if (boardstate[x, y, z] == 0)
                         {
                             if (is3D) movableGrid3D[x, y, z].SetActive(true);
                             else movableGrid2D[x, y, z].SetActive(true);
@@ -650,7 +650,7 @@ namespace PvP993
                     }
                 }
             }
-            
+
             komainst.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
         }
 
@@ -771,7 +771,7 @@ namespace PvP993
         private void MochigomaRemove(int idx)
         {
             Vector3 pos;
-            if(turn == 1)
+            if (turn == 1)
             {
                 pos = myMochigomaInstance[idx].transform.localPosition;
                 myMochigomaBox.RemoveAt(idx);
@@ -827,15 +827,15 @@ namespace PvP993
 
         private Vector3Int CheckOute() //相手（turn*-1）の王に王手がかかっているかを判定. かかっているなら王手をかけている駒の座標を返す
         {
-            if(turn == 1)
+            if (turn == 1)
             {
-                for(int x = 0; x < xLength; x++)
+                for (int x = 0; x < xLength; x++)
                 {
-                    for(int y = 0; y < yLength; y++)
+                    for (int y = 0; y < yLength; y++)
                     {
-                        for(int z = 0; z < zLength; z++)
+                        for (int z = 0; z < zLength; z++)
                         {
-                            if(boardstate[x, y, z] > 0)
+                            if (boardstate[x, y, z] > 0)
                             {
                                 Vector3Int now = new Vector3Int(x, y, z);
                                 if (CheckMovable_Specific(boardstate, boardstate[x, y, z], turn, now, opOuPos)) return now;
@@ -1164,11 +1164,11 @@ namespace PvP993
 
         public void UnActivateChoosingGrid()
         {
-            for(int x = 0; x < xLength; x++)
+            for (int x = 0; x < xLength; x++)
             {
-                for(int y = 0; y < yLength; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    for(int z = 0; z < zLength; z++)
+                    for (int z = 0; z < zLength; z++)
                     {
                         //greenBox3D[x, y, z].SetActive(false);
                         //greenBox2D[x, y, z].SetActive(false);
@@ -1184,8 +1184,8 @@ namespace PvP993
 
         }
 
-        
-        
+
+
         public void SetGridButton2D(Button b, int x, int y, int z) { gridButton2D[x, y, z] = b; }
         public Button ChooseResetButton2D { set { chooseResetButton2D = value; } }
         public bool MouseDetectable { get { return mouseDetectable; } set { mouseDetectable = value; } }

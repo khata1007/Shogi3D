@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 261167067914147429}
   - component: {fileID: 261167067914147430}
   - component: {fileID: 261167067914147431}
-  - component: {fileID: 261167067914147736}
+  - component: {fileID: 2021421069352428954}
   m_Layer: 0
   m_Name: FuPrefab_down
   m_TagString: Untagged
@@ -52,7 +52,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d037beea9b0de0c46b6f80e5a7425c73, type: 2}
+  - {fileID: 2100000, guid: 2ee5adb66a5ffc34fa6537a47681bd36, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -81,7 +81,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 261167067914147737}
   m_Mesh: {fileID: 0}
---- !u!114 &261167067914147736
+--- !u!114 &2021421069352428954
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,7 +93,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31d881d7194a5d34d8bc9feba73887f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mat: {fileID: 2100000, guid: 9d76029ceb7ae28418f6db58a43104ed, type: 2}
+  _mat:
+  - {fileID: 2100000, guid: 2ee5adb66a5ffc34fa6537a47681bd36, type: 2}
+  - {fileID: 2100000, guid: 824f47f16fd97bb4dbe2cb32f5d43c59, type: 2}
 --- !u!1 &261167068298434547
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,7 +272,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u6B69"
+  m_Text: 
 --- !u!1 &261167069825852458
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,4 +349,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u6B69"
+  m_Text: 

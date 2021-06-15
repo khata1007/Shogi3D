@@ -13,14 +13,14 @@ namespace PvP553
         private int zLength = Choose.InitialSetting.zLength;
         private float komaScale2D;
         private float komaScale3D;
-        private GameObject[,,] koma3D;
-        private GameObject[,,] koma2D;
+        private MakeKomaPrefs.KomaPrefab[,,] koma3D;
+        private MakeKomaPrefs.KomaPrefab2D[,,] koma2D;
         private int[,,] boardstate;
         private static int nariflg = 0;
         private Transform pieces3DTransform;
         private Transform pieces2DTransform;
-        public GameObject[] pieces = new GameObject[22];
-        public GameObject[] pieces2D = new GameObject[8];
+        public MakeKomaPrefs.KomaPrefab[] pieces = new MakeKomaPrefs.KomaPrefab[10];
+        public MakeKomaPrefs.KomaPrefab2D[] pieces2D = new MakeKomaPrefs.KomaPrefab2D[10];
         public enum Kind { Emp, Fu, Kyo, Kei, Gin, Kak, Hi, Kin, Ou, Gyo, To, NariKyo, NariKei, NariGin, Uma, Ryu };
 
         public static readonly int diff_nari = 9;
@@ -64,39 +64,39 @@ namespace PvP553
 
         private static List<Vector3Int>[] komaMove;
 
-        private static readonly Dictionary<string, int> komaName_to_kind =
-            new Dictionary<string, int>()
-        {
-                {"歩", (int) Kind.Fu },
-                {"香\n車", (int) Kind.Kyo },
-                {"桂\n馬", (int) Kind.Kei },
-                {"銀\n将", (int) Kind.Gin },
-                {"角\n行", (int) Kind.Kak },
-                {"飛\n車", (int) Kind.Hi },
-                {"金\n将", (int) Kind.Kin },
-                {"王\n将", (int) Kind.Ou },
-                {"玉\n将", (int) Kind.Gyo },
-                {"と", (int) Kind.To },
-                {"成\n香", (int) Kind.NariKyo },
-                {"成\n桂", (int) Kind.NariKei },
-                {"成\n銀", (int) Kind.NariGin },
-                {"馬", (int) Kind.Uma },
-                {"竜", (int) Kind.Ryu },
-        };
+        // private static readonly Dictionary<string, int> komaName_to_kind =
+        //     new Dictionary<string, int>()
+        // {
+        //         {"歩", (int) Kind.Fu },
+        //         {"香\n車", (int) Kind.Kyo },
+        //         {"桂\n馬", (int) Kind.Kei },
+        //         {"銀\n将", (int) Kind.Gin },
+        //         {"角\n行", (int) Kind.Kak },
+        //         {"飛\n車", (int) Kind.Hi },
+        //         {"金\n将", (int) Kind.Kin },
+        //         {"王\n将", (int) Kind.Ou },
+        //         {"玉\n将", (int) Kind.Gyo },
+        //         {"と", (int) Kind.To },
+        //         {"成\n香", (int) Kind.NariKyo },
+        //         {"成\n桂", (int) Kind.NariKei },
+        //         {"成\n銀", (int) Kind.NariGin },
+        //         {"馬", (int) Kind.Uma },
+        //         {"竜", (int) Kind.Ryu },
+        // };
 
-        private static readonly Dictionary<string, string> nari =
-            new Dictionary<string, string>()
-        {
-                {"歩", "と" },
-                {"香\n車", "成\n香" },
-                {"桂\n馬", "成\n桂" },
-                {"銀\n将", "成\n銀" },
-                {"金\n将", "金\n将" },
-                {"角\n行", "馬" },
-                {"飛\n車", "竜" },
-                {"王\n将", "王\n将" },
-                {"玉\n将", "玉\n将" },
-        };
+        // private static readonly Dictionary<string, string> nari =
+        //     new Dictionary<string, string>()
+        // {
+        //         {"歩", "と" },
+        //         {"香\n車", "成\n香" },
+        //         {"桂\n馬", "成\n桂" },
+        //         {"銀\n将", "成\n銀" },
+        //         {"金\n将", "金\n将" },
+        //         {"角\n行", "馬" },
+        //         {"飛\n車", "竜" },
+        //         {"王\n将", "王\n将" },
+        //         {"玉\n将", "玉\n将" },
+        // };
 
         private void Awake()
         {
@@ -275,49 +275,56 @@ namespace PvP553
             Transform pieces3DTransform = this.transform.GetChild(0).gameObject.transform;
             Transform pieces2DTransform = this.transform.GetChild(1).gameObject.transform;
             int k = (int)kind; //kindにあたる駒のpiecesにおける添え字番号を計算
-            koma3D[x, y, z] = Instantiate(pieces[k], pieces3DTransform);
-            koma3D[x, y, z].layer = koma3D[x, y, z].transform.parent.gameObject.layer;
+            koma3D[x, y, z] = Instantiate<MakeKomaPrefs.KomaPrefab>(pieces[k], pieces3DTransform);
+            koma3D[x, y, z].gameObject.layer = koma3D[x, y, z].transform.parent.gameObject.layer;
             koma3D[x, y, z].transform.localPosition = new Vector3(x, y - 0.5f, z);
             if (o == -1) koma3D[x, y, z].transform.eulerAngles = new Vector3(0, 180, 0);
             koma3D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
-            koma3D[x, y, z].SetLayerRecursively(11);
+            koma3D[x, y, z].gameObject.SetLayerRecursively(11);
 
             koma2D[x, y, z] = Instantiate(pieces2D[k], pieces2DTransform);
-            koma2D[x, y, z].layer = koma2D[x, y, z].transform.parent.gameObject.layer;
+            koma2D[x, y, z].gameObject.layer = koma2D[x, y, z].transform.parent.gameObject.layer;
             koma2D[x, y, z].transform.localPosition = new Vector3((x - (xLength - 1) / 2) * komaScale2D, 0, ((z - (zLength - 1) / 2) - (1 - y) * (zLength + 1)) * komaScale2D);
             if (o == -1) koma2D[x, y, z].transform.Rotate(new Vector3(0, 180, 0));
             koma2D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
-            koma2D[x, y, z].SetActive(true);
+            koma2D[x, y, z].gameObject.SetActive(true);
 
             koma2D[x, y, z].transform.localScale = new Vector3(komaScale2D, komaScale2D, komaScale2D);
-            koma2D[x, y, z].SetLayerRecursively(10);
+            koma2D[x, y, z].gameObject.SetLayerRecursively(10);
             boardstate[x, y, z] = (int)kind * o;
         }
 
-        public int Nari(GameObject koma3D, GameObject koma2D)
+        public int Nari(MakeKomaPrefs.KomaPrefab koma3D, MakeKomaPrefs.KomaPrefab2D koma2D)
         {
-            Text targetText3D = koma3D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
+            koma3D.ChangeMat();
+            koma2D.ChangeMat();
 
-            string kind = targetText3D.text;
-            targetText3D.text = nari[kind];
+            // Text targetText3D = koma3D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
 
-            targetText3D = koma3D.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>();
-            targetText3D.text = nari[kind];
+            // string kind = targetText3D.text;
+            // targetText3D.text = nari[kind];
 
-            Text targetText2D = koma2D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
-            targetText2D.text = nari[kind];
+            // targetText3D = koma3D.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>();
+            // targetText3D.text = nari[kind];
 
-            return komaName_to_kind[nari[kind]]; //正値を返すので手番に応じて呼び出し元で-1倍してね
+            // Text targetText2D = koma2D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
+            // targetText2D.text = nari[kind];
+
+
+            //return komaName_to_kind[nari[kind]]; //正値を返すので手番に応じて呼び出し元で-1倍してね
+            int ret = koma2D.Komakind + diff_nari > Enum.GetValues(typeof(Kind)).Length + 1 ? koma2D.Komakind : koma2D.Komakind + diff_nari;
+            Debug.Log("ret: " + ret);
+            return koma2D.Komakind + diff_nari > Enum.GetValues(typeof(Kind)).Length + 1 ? koma2D.Komakind : koma2D.Komakind + diff_nari;
         }
 
 
         public static List<Vector3Int> getKomaMove(int k) { return komaMove[Math.Abs(k)]; }
-        public GameObject GetKoma3D(int k) { return pieces[k]; }
-        public GameObject GetKoma2D(int k) { return pieces2D[k]; }
+        public MakeKomaPrefs.KomaPrefab GetKoma3D(int k) { return pieces[k]; }
+        public MakeKomaPrefs.KomaPrefab2D GetKoma2D(int k) { return pieces2D[k]; }
         public float KomaScale2D { set { this.komaScale2D = value; } }
         public float KomaScale3D { set { this.komaScale3D = value; } }
-        public GameObject[,,] Koma3D { set { this.koma3D = value; } }
-        public GameObject[,,] Koma2D { set { this.koma2D = value; } }
+        public MakeKomaPrefs.KomaPrefab[,,] Koma3D { set { this.koma3D = value; } }
+        public MakeKomaPrefs.KomaPrefab2D[,,] Koma2D { set { this.koma2D = value; } }
         public int[,,] Boardstate { set { this.boardstate = value; } }
         public static int Nariflg { set { if (value == 1 || value == -1) nariflg = value; } }
     }
