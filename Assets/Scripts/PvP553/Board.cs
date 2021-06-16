@@ -39,6 +39,9 @@ namespace PvP553
         public GameObject movableGridPrefab3D;
         public GameObject movableGridPrefab2D;
 
+        public GameObject boardImage;
+        public GameObject boardMatPrefab;
+
         public Game game;
         // Start is called before the first frame update
         void Start()
@@ -134,12 +137,19 @@ namespace PvP553
                         gb2D[x, y, z].layer = gb2D[x, y, z].transform.parent.gameObject.layer;
                         gb2D[x, y, z].SetActive(false);
                         mg2D[x, y, z] = Instantiate(movableGridPrefab2D, movableGridTransform2D);
-                        mg2D[x, y, z].transform.localPosition = new Vector3((x - (xLength - 1) / 2) * boardScale2D, -0.1f, (z - (zLength - 1) / 2) * boardScale2D - offset);
-                        mg2D[x, y, z].transform.localScale = new Vector3(boardScale2D * mgZoom, 0.01f, boardScale2D * mgZoom);
+                        mg2D[x, y, z].transform.localPosition = new Vector3((x - (xLength - 1) / 2) * boardScale2D, -0.005f, (z - (zLength - 1) / 2) * boardScale2D - offset);
+                        mg2D[x, y, z].transform.localScale = new Vector3(boardScale2D * mgZoom, 0.001f, boardScale2D * mgZoom);
                         mg2D[x, y, z].layer = mg2D[x, y, z].transform.parent.gameObject.layer;
                         mg2D[x, y, z].SetActive(false);
                     }
                 }
+            }
+            for (int i = -1; i <= 1; i++)
+            {
+                GameObject g = Instantiate(boardMatPrefab, boardImage.transform);
+                g.transform.localPosition = new Vector3(0, -0.01f, i * (zLength + 1) * boardScale2D);
+                g.transform.localScale = new Vector3(boardScale2D * xLength, 0.001f, boardScale2D * zLength);
+                g.layer = g.transform.parent.gameObject.layer;
             }
             Debug.Log(ob2D[0, 0, 0].transform.position);
         }
@@ -217,5 +227,5 @@ namespace PvP553
         public float BoardScale2D { set { boardScale2D = value; } }
         public float BoardScale3D { set { boardScale3D = value; } }
     }
-    
+
 }
