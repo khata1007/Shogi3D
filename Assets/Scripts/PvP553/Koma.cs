@@ -254,19 +254,19 @@ namespace PvP553
 
         public void InitialSet()
         {
-            PutKoma(1, Kind.Fu, 0, 0, 1);
-            PutKoma(1, Kind.Ou, 0, 0, 0);
-            PutKoma(1, Kind.Kin, 1, 0, 0);
-            PutKoma(1, Kind.Gin, 2, 0, 0);
-            PutKoma(1, Kind.Kak, 3, 0, 0);
-            PutKoma(1, Kind.Hi, 4, 0, 0);
+            PutKoma(1, Kind.Fu, 0, 1, 1);
+            PutKoma(1, Kind.Ou, 0, 1, 0);
+            PutKoma(1, Kind.Kin, 1, 1, 0);
+            PutKoma(1, Kind.Gin, 2, 1, 0);
+            PutKoma(1, Kind.Kak, 3, 1, 0);
+            PutKoma(1, Kind.Hi, 4, 1, 0);
 
-            PutKoma(-1, Kind.Fu, 4, 2, 3);
-            PutKoma(-1, Kind.Gyo, 4, 2, 4);
-            PutKoma(-1, Kind.Kin, 3, 2, 4);
-            PutKoma(-1, Kind.Gin, 2, 2, 4);
-            PutKoma(-1, Kind.Kak, 1, 2, 4);
-            PutKoma(-1, Kind.Hi, 0, 2, 4);
+            PutKoma(-1, Kind.Fu, 4, 1, 3);
+            PutKoma(-1, Kind.Gyo, 4, 1, 4);
+            PutKoma(-1, Kind.Kin, 3, 1, 4);
+            PutKoma(-1, Kind.Gin, 2, 1, 4);
+            PutKoma(-1, Kind.Kak, 1, 1, 4);
+            PutKoma(-1, Kind.Hi, 0, 1, 4);
 
         }
 
