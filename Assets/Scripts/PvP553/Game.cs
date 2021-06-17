@@ -94,6 +94,8 @@ namespace PvP553
         // Start is called before the first frame update
         void Start()
         {
+            centerRightCamera.transform.localPosition = new Vector3(scale2D, 20, 0);
+
             orangeBox3D = new GameObject[xLength, yLength, zLength];
             greenBox3D = new GameObject[xLength, yLength, zLength];
 
@@ -117,10 +119,15 @@ namespace PvP553
             opReachablePieces = new int[xLength, yLength, zLength];
 
             int piecenum = 40; //持ち駒になり得る駒は高々40枚
+            myMochigomaObj.transform.localPosition = new Vector3((xLength + 1) / 2 * scale2D, 0, -(zLength - 1) * scale2D);
+            myMochigomaObj.transform.localScale = new Vector3(scale2D, scale2D, scale2D);
             myMochigomaInstance = new List<MakeKomaPrefs.KomaPrefab2D>(piecenum);
             myMochigomaIdx = new List<int>(piecenum);
             myMochigomaButton = new List<Button>(piecenum);
             myMochigomaBox = new List<GameObject>(piecenum);
+            opponentMochigomaObj.transform.localPosition = new Vector3((xLength + 1) / 2 * scale2D, 0, (zLength - 1) * scale2D);
+            opponentMochigomaObj.transform.eulerAngles = new Vector3(0, 180, 0);
+            opponentMochigomaObj.transform.localScale = new Vector3(scale2D, scale2D, scale2D);
             opMochigomaInstance = new List<MakeKomaPrefs.KomaPrefab2D>(piecenum);
             opMochigomaIdx = new List<int>(piecenum);
             opMochigomaButton = new List<Button>(piecenum);
@@ -253,6 +260,8 @@ namespace PvP553
                         MochigomaGenerate(Math.Abs(boardstate[pushx, pushy, pushz]));
                         Destroy(koma_on_board3D[pushx, pushy, pushz].gameObject);
                         Destroy(koma_on_board2D[pushx, pushy, pushz].gameObject);
+                        koma_on_board3D[pushx, pushy, pushz] = null;
+                        koma_on_board2D[pushx, pushy, pushz] = null;
                     }
 
                     int dx = pushx - fromx, dy = pushy - fromy, dz = pushz - fromz;
@@ -269,7 +278,7 @@ namespace PvP553
                     UnActivateChoosingGrid();
 
                     //王を動かしてるかどうかチェック
-                    if (8 <= Math.Abs(boardstate[pushx, pushy, pushz]) && Math.Abs(boardstate[pushx, pushy, pushz]) <= 9)
+                    if ((int)Koma.Kind.Ou <= Math.Abs(boardstate[pushx, pushy, pushz]) && Math.Abs(boardstate[pushx, pushy, pushz]) <= (int)Koma.Kind.Gyo)
                     {
                         if (turn == 1) myOuPos = new Vector3Int(pushx, pushy, pushz);
                         else opOuPos = new Vector3Int(pushx, pushy, pushz);
@@ -384,111 +393,111 @@ namespace PvP553
 
         public void ChangeDimension()
         {
-            Debug.Log("fuck");
+            // Debug.Log("fuck");
 
 
-            is3D = !is3D;
-            cameraMover.CameraMovable = !cameraMover.CameraMovable;
-            for (int x = 0; x < xLength; x++)
-            {
-                for (int y = 0; y < yLength; y++)
-                {
-                    for (int z = 0; z < zLength; z++)
-                    {
-                        if (koma_on_board3D[x, y, z] != null) koma_on_board3D[x, y, z].gameObject.SetActive(!koma_on_board3D[x, y, z].gameObject.activeSelf);
-                        if (koma_on_board2D[x, y, z] != null) koma_on_board2D[x, y, z].gameObject.SetActive(!koma_on_board2D[x, y, z].gameObject.activeSelf);
-                    }
-                }
-            }
+            // is3D = !is3D;
+            // cameraMover.CameraMovable = !cameraMover.CameraMovable;
+            // for (int x = 0; x < xLength; x++)
+            // {
+            //     for (int y = 0; y < yLength; y++)
+            //     {
+            //         for (int z = 0; z < zLength; z++)
+            //         {
+            //             if (koma_on_board3D[x, y, z] != null) koma_on_board3D[x, y, z].gameObject.SetActive(!koma_on_board3D[x, y, z].gameObject.activeSelf);
+            //             if (koma_on_board2D[x, y, z] != null) koma_on_board2D[x, y, z].gameObject.SetActive(!koma_on_board2D[x, y, z].gameObject.activeSelf);
+            //         }
+            //     }
+            // }
 
-            for (int y = 0; y < yLength; y++)
-            {
-                for (int z = 0; z <= zLength; z++)
-                {
-                    frameX3D[y, z].SetActive(!frameX3D[y, z].activeSelf);
-                    frameX2D[y, z].SetActive(!frameX2D[y, z].activeSelf);
-                }
-            }
-            for (int y = 0; y < yLength; y++)
-            {
-                for (int x = 0; x <= xLength; x++)
-                {
-                    frameZ3D[y, x].SetActive(!frameZ3D[y, x].activeSelf);
-                    frameZ2D[y, x].SetActive(!frameZ2D[y, x].activeSelf);
-                }
-            }
+            // for (int y = 0; y < yLength; y++)
+            // {
+            //     for (int z = 0; z <= zLength; z++)
+            //     {
+            //         frameX3D[y, z].SetActive(!frameX3D[y, z].activeSelf);
+            //         frameX2D[y, z].SetActive(!frameX2D[y, z].activeSelf);
+            //     }
+            // }
+            // for (int y = 0; y < yLength; y++)
+            // {
+            //     for (int x = 0; x <= xLength; x++)
+            //     {
+            //         frameZ3D[y, x].SetActive(!frameZ3D[y, x].activeSelf);
+            //         frameZ2D[y, x].SetActive(!frameZ2D[y, x].activeSelf);
+            //     }
+            // }
 
-            if (frameZ2D[0, 0].activeSelf) //2Dモードに切り替えた場合はカメラを固定
-            {
-                float c = 4.5f;
-                prevCameraPos = cameraMover.MainCameraTransformPosition;
-                cameraMover.MainCamera2DSetting(new Vector3(c, 12, c), new Vector3(c, 0, c));
-            }
-            else cameraMover.MainCameraTransformPosition = prevCameraPos;
+            // if (frameZ2D[0, 0].activeSelf) //2Dモードに切り替えた場合はカメラを固定
+            // {
+            //     float c = 4.5f;
+            //     prevCameraPos = cameraMover.MainCameraTransformPosition;
+            //     cameraMover.MainCamera2DSetting(new Vector3(c, 12, c), new Vector3(c, 0, c));
+            // }
+            // else cameraMover.MainCameraTransformPosition = prevCameraPos;
 
-            //3Dと2DのorangeBox, greenBox, movableGridのactiveを（必要なら）入れ替える
-            for (int x = 0; x < xLength; x++)
-            {
-                for (int y = 0; y < yLength; y++)
-                {
-                    for (int z = 0; z < zLength; z++)
-                    {
-                        bool active3D, active2D;
-                        active3D = orangeBox3D[x, y, z].activeSelf;
-                        active2D = orangeBox2D[x, y, z].activeSelf;
-                        if (active3D & !active2D)
-                        {
-                            orangeBox2D[x, y, z].SetActive(true);
-                            orangeBox3D[x, y, z].SetActive(false);
-                        }
-                        else if (!active3D & active2D)
-                        {
-                            orangeBox2D[x, y, z].SetActive(false);
-                            orangeBox3D[x, y, z].SetActive(true);
-                        }
+            // //3Dと2DのorangeBox, greenBox, movableGridのactiveを（必要なら）入れ替える
+            // for (int x = 0; x < xLength; x++)
+            // {
+            //     for (int y = 0; y < yLength; y++)
+            //     {
+            //         for (int z = 0; z < zLength; z++)
+            //         {
+            //             bool active3D, active2D;
+            //             active3D = orangeBox3D[x, y, z].activeSelf;
+            //             active2D = orangeBox2D[x, y, z].activeSelf;
+            //             if (active3D & !active2D)
+            //             {
+            //                 orangeBox2D[x, y, z].SetActive(true);
+            //                 orangeBox3D[x, y, z].SetActive(false);
+            //             }
+            //             else if (!active3D & active2D)
+            //             {
+            //                 orangeBox2D[x, y, z].SetActive(false);
+            //                 orangeBox3D[x, y, z].SetActive(true);
+            //             }
 
-                        active3D = greenBox3D[x, y, z].activeSelf;
-                        active2D = greenBox2D[x, y, z].activeSelf;
-                        if (active3D & !active2D)
-                        {
-                            greenBox2D[x, y, z].SetActive(true);
-                            greenBox3D[x, y, z].SetActive(false);
-                        }
-                        else if (!active3D & active2D)
-                        {
-                            greenBox2D[x, y, z].SetActive(false);
-                            greenBox3D[x, y, z].SetActive(true);
-                        }
+            //             active3D = greenBox3D[x, y, z].activeSelf;
+            //             active2D = greenBox2D[x, y, z].activeSelf;
+            //             if (active3D & !active2D)
+            //             {
+            //                 greenBox2D[x, y, z].SetActive(true);
+            //                 greenBox3D[x, y, z].SetActive(false);
+            //             }
+            //             else if (!active3D & active2D)
+            //             {
+            //                 greenBox2D[x, y, z].SetActive(false);
+            //                 greenBox3D[x, y, z].SetActive(true);
+            //             }
 
-                        active3D = movableGrid3D[x, y, z].activeSelf;
-                        active2D = movableGrid2D[x, y, z].activeSelf;
-                        if (active3D & !active2D)
-                        {
-                            movableGrid2D[x, y, z].SetActive(true);
-                            movableGrid3D[x, y, z].SetActive(false);
-                        }
-                        else if (!active3D & active2D)
-                        {
-                            movableGrid2D[x, y, z].SetActive(false);
-                            movableGrid3D[x, y, z].SetActive(true);
-                        }
+            //             active3D = movableGrid3D[x, y, z].activeSelf;
+            //             active2D = movableGrid2D[x, y, z].activeSelf;
+            //             if (active3D & !active2D)
+            //             {
+            //                 movableGrid2D[x, y, z].SetActive(true);
+            //                 movableGrid3D[x, y, z].SetActive(false);
+            //             }
+            //             else if (!active3D & active2D)
+            //             {
+            //                 movableGrid2D[x, y, z].SetActive(false);
+            //                 movableGrid3D[x, y, z].SetActive(true);
+            //             }
 
 
-                    }
-                }
-            }
+            //         }
+            //     }
+            // }
 
-            //gridButton の enabled を入れ替える
-            for (int x = 0; x < xLength; x++)
-            {
-                for (int y = 0; y < yLength; y++)
-                {
-                    for (int z = 0; z < zLength; z++)
-                    {
-                        gridButton2D[x, y, z].enabled = !gridButton2D[x, y, z].enabled;
-                    }
-                }
-            }
+            // //gridButton の enabled を入れ替える
+            // for (int x = 0; x < xLength; x++)
+            // {
+            //     for (int y = 0; y < yLength; y++)
+            //     {
+            //         for (int z = 0; z < zLength; z++)
+            //         {
+            //             gridButton2D[x, y, z].enabled = !gridButton2D[x, y, z].enabled;
+            //         }
+            //     }
+            // }
 
         }
 
@@ -679,10 +688,12 @@ namespace PvP553
             MakeKomaPrefs.KomaPrefab2D g;
             if (turn == 1) g = Instantiate<MakeKomaPrefs.KomaPrefab2D>(p, myMochigomaObj.transform);
             else g = Instantiate<MakeKomaPrefs.KomaPrefab2D>(p, opponentMochigomaObj.transform);
-            g.transform.localPosition = new Vector3(-10 * turn, 0, 0);
+            g.transform.localPosition = new Vector3(0, 0, 0);
 
             Transform canv = g.transform.GetChild(0).transform;
-            canv.GetComponent<Canvas>().worldCamera = (turn == 1) ? underCamera : upperCamera;
+            //canv.GetComponent<Canvas>().worldCamera = (turn == 1) ? underCamera : upperCamera;
+            canv.GetComponent<Canvas>().worldCamera = centerRightCamera;
+
 
             GameObject but = Instantiate(mochigomaButtonPrefab, canv);
             but.transform.localPosition = new Vector3(0, 0, 0);
@@ -695,8 +706,9 @@ namespace PvP553
             box.transform.localScale = new Vector3(1, 1, 0.01f);
             box.SetActive(false);
 
-            if (turn == 1) g.gameObject.SetLayerRecursively(8);
-            else g.gameObject.SetLayerRecursively(9);
+            // if (turn == 1) g.gameObject.SetLayerRecursively(8);
+            // else g.gameObject.SetLayerRecursively(9);
+            g.gameObject.SetLayerRecursively(10); //CenterRightCameraのみが映す
 
 
             if (turn == 1)
@@ -813,30 +825,39 @@ namespace PvP553
         private void MochigomaRelocate() //画面右端を超えないように持ち駒の位置調整
         {
             float newScale = 20.0f;
+            if (opMochigomaInstance.Count >= 20) newScale /= opMochigomaInstance.Count;
+            else newScale = 1.0f;
+            Vector3 pos = new Vector3(0, 0, 0);
+            Vector3 inc = new Vector3(0, 0, -newScale);
+            int cnt = 0;
             if (turn == 1)
             {
-                if (myMochigomaInstance.Count >= 20) newScale /= myMochigomaInstance.Count;
-                else newScale = 1.0f;
-                Vector3 pos = new Vector3(-10, 0, 0);
-                Vector3 inc = new Vector3(newScale, 0, 0);
                 foreach (MakeKomaPrefs.KomaPrefab2D inst in myMochigomaInstance)
                 {
                     inst.transform.localScale = new Vector3(newScale, newScale, newScale);
                     inst.transform.localPosition = pos;
                     pos += inc;
+                    cnt++;
+                    if (cnt % 5 == 0)
+                    {
+                        pos.z = 0;
+                        pos.x += newScale;
+                    }
                 }
             }
             else
             {
-                if (opMochigomaInstance.Count >= 20) newScale /= opMochigomaInstance.Count;
-                else newScale = 1.0f;
-                Vector3 pos = new Vector3(10, 0, 0);
-                Vector3 inc = new Vector3(-newScale, 0, 0);
                 foreach (MakeKomaPrefs.KomaPrefab2D inst in opMochigomaInstance)
                 {
                     inst.transform.localScale = new Vector3(newScale, newScale, newScale);
                     inst.transform.localPosition = pos;
                     pos += inc;
+                    cnt++;
+                    if (cnt % 5 == 0)
+                    {
+                        pos.z = 0;
+                        pos.x -= newScale;
+                    }
                 }
             }
         }
