@@ -12,16 +12,21 @@ namespace PvP553
     {
         int turn;
         Vector3Int from, to;
+        Koma.Kind fromState, toState;
         Koma.Kind get;
-        public Record(int tr, Vector3Int f, Vector3Int t, Koma.Kind g)
+        public Record(int tr, Vector3Int f, Koma.Kind fs, Vector3Int t, Koma.Kind ts, Koma.Kind g)
         {
             turn = tr;
             from = f; to = t;
+            fromState = fs; toState = ts;
             get = g;
         }
         public int Turn { get { return turn; } }
         public Vector3Int From { get { return from; } }
         public Vector3Int To { get { return to; } }
+
+        public Koma.Kind FromState { get { return fromState; } }
+        public Koma.Kind ToState { get { return toState; } }
         public Koma.Kind Get { get { return get; } }
 
     }
@@ -219,6 +224,7 @@ namespace PvP553
             if (movableGrid2D[pushx, pushy, pushz].activeSelf)
             {
                 Koma.Kind got = Koma.Kind.Emp; //取った駒
+                Koma.Kind fs, ts;
                 int fromx = -1, fromy = -1, fromz = -1;
                 for (int x = 0; x < xLength; x++)
                 {
@@ -246,11 +252,15 @@ namespace PvP553
                     else koma.PutKoma(turn, (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Math.Abs(opMochigomaIdx[choose])), pushx, pushy, pushz);
                     koma_on_board2D[pushx, pushy, pushz].gameObject.SetActive(true);
                     koma_on_board3D[pushx, pushy, pushz].gameObject.SetActive(true);
+                    fs = (turn == 1) ? (Koma.Kind)(Math.Abs(myMochigomaIdx[choose])) : (Koma.Kind)(Math.Abs(opMochigomaIdx[choose]));
+                    ts = fs;
                     MochigomaRemove(choose);
                     UnActivateChoosingGrid();
                 }
                 else
                 {
+                    fs = (Koma.Kind)Math.Abs(boardstate[fromx, fromy, fromz]);
+                    ts = fs;
                     if (!CheckLegal(boardstate[fromx, fromy, fromz], new Vector3Int(fromx, fromy, fromz), new Vector3Int(pushx, pushy, pushz))) return; //合法手でなければreturn
 
                     if ( //桂馬で成らなければいけない場所に打った時
@@ -272,6 +282,7 @@ namespace PvP553
                         if (res)
                         {
                             boardstate[fromx, fromy, fromz] = koma.Nari(koma_on_board3D[fromx, fromy, fromz], koma_on_board2D[fromx, fromy, fromz]) * turn;
+                            ts = (Koma.Kind)Math.Abs(boardstate[fromx, fromy, fromz]);
                         }
                         nariConfirmCanvas.SetActive(false);
                         mouseDetectable = true;
@@ -279,7 +290,7 @@ namespace PvP553
                     if (boardstate[pushx, pushy, pushz] != 0) //相手の駒が置かれている場所に移動する場合
                     {
                         got = (Koma.Kind)Math.Abs(boardstate[pushx, pushy, pushz]);
-                        MochigomaGenerate(Math.Abs(boardstate[pushx, pushy, pushz]));
+                        MochigomaGenerate(got);
                         Destroy(koma_on_board3D[pushx, pushy, pushz].gameObject);
                         Destroy(koma_on_board2D[pushx, pushy, pushz].gameObject);
                         koma_on_board3D[pushx, pushy, pushz] = null;
@@ -314,7 +325,7 @@ namespace PvP553
                 }
                 greenBox3D[pushx, pushy, pushz].SetActive(true);
                 greenBox2D[pushx, pushy, pushz].SetActive(true); //今打った手を緑に光らせておく
-                record.Add(new Record(turn, new Vector3Int(fromx, fromy, fromz), new Vector3Int(pushx, pushy, pushz), got));
+                record.Add(new Record(turn, new Vector3Int(fromx, fromy, fromz), fs, new Vector3Int(pushx, pushy, pushz), ts, got));
 
                 CalcReachableRange(); //駒の各マスに対する到達可能性を再計算
 
@@ -699,13 +710,15 @@ namespace PvP553
         }
 
         //持ち駒を生成して整列するメソッド
-        private void MochigomaGenerate(int kind)
+        private void MochigomaGenerate(Koma.Kind k, int aimturn = 0)
         {
+            int kind = (int)k;
+            if (aimturn == 0) aimturn = turn;
             //持ち駒のインスタンスやボタン, オレンジのタイル等の設定
             if (kind >= (int)Koma.Kind.To) kind -= Koma.diff_nari;
             MakeKomaPrefs.KomaPrefab2D p = koma.GetKoma2D(kind);
             MakeKomaPrefs.KomaPrefab2D g;
-            if (turn == 1) g = Instantiate<MakeKomaPrefs.KomaPrefab2D>(p, myMochigomaObj.transform);
+            if (aimturn == 1) g = Instantiate<MakeKomaPrefs.KomaPrefab2D>(p, myMochigomaObj.transform);
             else g = Instantiate<MakeKomaPrefs.KomaPrefab2D>(p, opponentMochigomaObj.transform);
             g.transform.localPosition = new Vector3(0, 0, 0);
 
@@ -718,7 +731,7 @@ namespace PvP553
             but.transform.localPosition = new Vector3(0, 0, 0);
 
             Button b = but.transform.GetComponent<Button>();
-            b.onClick.AddListener(() => ChooseMochigoma(g, turn * kind));
+            b.onClick.AddListener(() => ChooseMochigoma(g, aimturn * kind));
 
             GameObject box = Instantiate(mochigomaBoxPrefab, canv);
             box.transform.localPosition = new Vector3(0, 0, 0);
@@ -730,25 +743,25 @@ namespace PvP553
             g.gameObject.SetLayerRecursively(10); //CenterRightCameraのみが映す
 
 
-            if (turn == 1)
+            if (aimturn == 1)
             {
                 myMochigomaInstance.Add(g);
-                myMochigomaIdx.Add(turn * kind);
+                myMochigomaIdx.Add(aimturn * kind);
                 myMochigomaBox.Add(box);
                 myMochigomaButton.Add(b);
             }
             else
             {
                 opMochigomaInstance.Add(g);
-                opMochigomaIdx.Add(turn * kind);
+                opMochigomaIdx.Add(aimturn * kind);
                 opMochigomaBox.Add(box);
                 opMochigomaButton.Add(b);
             }
 
             //挿入ソートにより正しい順番に並び替える
-            if (turn == 1)
+            if (aimturn == 1)
             {
-                int target = turn * kind;
+                int target = aimturn * kind;
                 int ins = -1;
                 for (int i = 0; i < myMochigomaIdx.Count - 1; i++)
                 {
@@ -780,7 +793,7 @@ namespace PvP553
             }
             else
             {
-                int target = turn * kind;
+                int target = aimturn * kind;
                 int ins = -1;
                 for (int i = 0; i < opMochigomaIdx.Count - 1; i++)
                 {
@@ -844,9 +857,9 @@ namespace PvP553
 
         private void MochigomaRelocate() //画面右端を超えないように持ち駒の位置調整
         {
-            float newScale = 20.0f;
-            if (opMochigomaInstance.Count >= 20) newScale /= opMochigomaInstance.Count;
-            else newScale = 1.0f;
+            float newScale = 1.0f;
+            //if (opMochigomaInstance.Count >= 20) newScale /= opMochigomaInstance.Count;
+            //else newScale = 1.0f;
             Vector3 pos = new Vector3(0, 0, 0);
             Vector3 inc = new Vector3(0, 0, -newScale);
             int cnt = 0;
@@ -863,6 +876,8 @@ namespace PvP553
                     pos.x += newScale;
                 }
             }
+            pos = new Vector3(0, 0, 0);
+            cnt = 0;
             foreach (MakeKomaPrefs.KomaPrefab2D inst in opMochigomaInstance)
             {
                 inst.transform.localScale = new Vector3(newScale, newScale, newScale);
@@ -1213,13 +1228,24 @@ namespace PvP553
 
             Debug.Log("record info: turn is " + op.Turn + ", from is " + op.From + ", to is " + op.To + ", get is " + op.Get);
 
-            koma_on_board3D[op.To.x, op.To.y, op.To.z].transform.localPosition = new Vector3(op.From.x, op.From.y - 0.5f, op.From.z);
-            koma_on_board2D[op.To.x, op.To.y, op.To.z].transform.localPosition = new Vector3((op.From.x - (xLength - 1) / 2), 0, ((op.From.z - (zLength - 1) / 2) - (1 - op.From.y) * (zLength + 1)));
+            if (op.From.x == -1)
+            {
+                Destroy(koma_on_board3D[op.To.x, op.To.y, op.To.z].gameObject);
+                koma_on_board3D[op.To.x, op.To.y, op.To.z] = null;
+                Destroy(koma_on_board2D[op.To.x, op.To.y, op.To.z].gameObject);
+                koma_on_board2D[op.To.x, op.To.y, op.To.z] = null;
+                MochigomaGenerate(op.FromState, op.Turn);
+            }
+            else
+            {
+                koma_on_board3D[op.To.x, op.To.y, op.To.z].transform.localPosition = new Vector3(op.From.x, op.From.y - 0.5f, op.From.z);
+                koma_on_board2D[op.To.x, op.To.y, op.To.z].transform.localPosition = new Vector3((op.From.x - (xLength - 1) / 2), 0, ((op.From.z - (zLength - 1) / 2) - (1 - op.From.y) * (zLength + 1)));
 
-            koma_on_board3D[op.From.x, op.From.y, op.From.z] = koma_on_board3D[op.To.x, op.To.y, op.To.z];
-            koma_on_board2D[op.From.x, op.From.y, op.From.z] = koma_on_board2D[op.To.x, op.To.y, op.To.z];
-            boardstate[op.From.x, op.From.y, op.From.z] = boardstate[op.To.x, op.To.y, op.To.z];
-            boardstate[op.To.x, op.To.y, op.To.z] = -op.Turn * (int)op.Get;
+                koma_on_board3D[op.From.x, op.From.y, op.From.z] = koma_on_board3D[op.To.x, op.To.y, op.To.z];
+                koma_on_board2D[op.From.x, op.From.y, op.From.z] = koma_on_board2D[op.To.x, op.To.y, op.To.z];
+                boardstate[op.From.x, op.From.y, op.From.z] = boardstate[op.To.x, op.To.y, op.To.z];
+                boardstate[op.To.x, op.To.y, op.To.z] = -op.Turn * (int)op.Get;
+            }
 
             greenBox3D[op.To.x, op.To.y, op.To.z].SetActive(false);
             if (secondlast != null) greenBox3D[secondlast.To.x, secondlast.To.y, secondlast.To.z].SetActive(true);
