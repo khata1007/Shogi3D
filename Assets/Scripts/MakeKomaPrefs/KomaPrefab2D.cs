@@ -19,12 +19,9 @@ namespace MakeKomaPrefs
         protected Mesh mesh; //meshの本体
 
         int komakind; //Fu -> 1, Kyo -> 2,...
-
-        MeshRenderer mr;
         protected void InitVars(Sunpou.Kind k)
         {
             komakind = (int)k;
-            mr = GetComponent<MeshRenderer>();
             sunpou = new float[3];
             degs = new float[3];
             for (int i = 0; i < 3; i++)
@@ -64,18 +61,17 @@ namespace MakeKomaPrefs
             1, 2, 4,
             2, 3, 4,
         };
-
             mesh.RecalculateNormals();
-
-            var filter = GetComponent<MeshFilter>();
-            filter.sharedMesh = mesh;
-            var renderer = GetComponent<MeshRenderer>();
-            renderer.material = _mat[0];
         }
 
         public void ChangeMat()
         {
-            if (mode == 0) { mr.material = _mat[1]; mode = 1; }
+            MeshRenderer mr = GetComponent<MeshRenderer>();
+            if (mode == 0)
+            {
+                mr.material = _mat[1];
+                mode = 1;
+            }
             else
             {
                 mr.material = _mat[0];

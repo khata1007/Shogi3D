@@ -1228,6 +1228,7 @@ namespace PvP553
 
             Debug.Log("record info: turn is " + op.Turn + ", from is " + op.From + ", to is " + op.To + ", get is " + op.Get);
 
+            //持ち駒から置いた時は,置いたところの駒をdestroyして持ち駒に加える
             if (op.From.x == -1)
             {
                 Destroy(koma_on_board3D[op.To.x, op.To.y, op.To.z].gameObject);
@@ -1236,15 +1237,21 @@ namespace PvP553
                 koma_on_board2D[op.To.x, op.To.y, op.To.z] = null;
                 MochigomaGenerate(op.FromState, op.Turn);
             }
+            //盤上から移動した時は,まずは置いた先の駒を置く前の位置に戻す. 移動により成っていたら, 先にマテリアルを変えてあげる
             else
             {
                 koma_on_board3D[op.To.x, op.To.y, op.To.z].transform.localPosition = new Vector3(op.From.x, op.From.y - 0.5f, op.From.z);
                 koma_on_board2D[op.To.x, op.To.y, op.To.z].transform.localPosition = new Vector3((op.From.x - (xLength - 1) / 2), 0, ((op.From.z - (zLength - 1) / 2) - (1 - op.From.y) * (zLength + 1)));
+                if (op.FromState < op.ToState)
+                {
+                    koma_on_board3D[op.To.x, op.To.y, op.To.z].ChangeMat();
+                    koma_on_board2D[op.To.x, op.To.y, op.To.z].ChangeMat();
+                }
 
+                boardstate[op.From.x, op.From.y, op.From.z] = (int)op.FromState * op.Turn;
                 koma_on_board3D[op.From.x, op.From.y, op.From.z] = koma_on_board3D[op.To.x, op.To.y, op.To.z];
                 koma_on_board2D[op.From.x, op.From.y, op.From.z] = koma_on_board2D[op.To.x, op.To.y, op.To.z];
-                boardstate[op.From.x, op.From.y, op.From.z] = boardstate[op.To.x, op.To.y, op.To.z];
-                boardstate[op.To.x, op.To.y, op.To.z] = -op.Turn * (int)op.Get;
+
             }
 
             greenBox3D[op.To.x, op.To.y, op.To.z].SetActive(false);
@@ -1252,23 +1259,21 @@ namespace PvP553
             greenBox2D[op.To.x, op.To.y, op.To.z].SetActive(false);
             if (secondlast != null) greenBox2D[secondlast.To.x, secondlast.To.y, secondlast.To.z].SetActive(true);
 
-            if (op.Get != 0)
+            //置いたことにより何か駒を取っていたら, それを持ち駒から戻してあげる
+            if (op.Get != Koma.Kind.Emp)
             {
+                int search = (op.Get >= Koma.Kind.To) ? op.Turn * ((int)op.Get - Koma.diff_nari) : op.Turn * (int)op.Get; //例えば成銀を取っていたら,持ち駒の中で探すべきは銀
                 //op.Turn == 1 なら、myMochigomaのop.Getを探して削除。PutKomaでインスタンス化
                 if (op.Turn == 1)
                 {
                     for (int i = 0; i < myMochigomaIdx.Count; i++)
                     {
-                        if ((int)op.Get == myMochigomaIdx[i])
+                        if (search == myMochigomaIdx[i])
                         {
                             MochigomaRemove(i, op.Turn);
-                            koma.PutKoma(-op.Turn, op.Get, op.To.x, op.To.y, op.To.z);
+                            koma.PutKoma(-op.Turn, (Koma.Kind)Math.Abs(search), op.To.x, op.To.y, op.To.z);
+                            if (op.Get >= Koma.Kind.To) koma.Nari(koma_on_board3D[op.To.x, op.To.y, op.To.z], koma_on_board2D[op.To.x, op.To.y, op.To.z]);
                             break;
-                        }
-                        if (i == myMochigomaIdx.Count - 1)
-                        {
-                            koma_on_board3D[op.To.x, op.To.y, op.To.z] = null;
-                            koma_on_board2D[op.To.x, op.To.y, op.To.z] = null;
                         }
                     }
                 }
@@ -1276,21 +1281,24 @@ namespace PvP553
                 {
                     for (int i = 0; i < opMochigomaIdx.Count; i++)
                     {
-                        if ((int)op.Get == -opMochigomaIdx[i])
+                        if (search == opMochigomaIdx[i])
                         {
                             MochigomaRemove(i, op.Turn);
-                            koma.PutKoma(-op.Turn, op.Get, op.To.x, op.To.y, op.To.z);
+                            koma.PutKoma(-op.Turn, (Koma.Kind)Math.Abs(search), op.To.x, op.To.y, op.To.z);
+                            Debug.Log("PutKoma fin");
+                            if (op.Get >= Koma.Kind.To) koma.Nari(koma_on_board3D[op.To.x, op.To.y, op.To.z], koma_on_board2D[op.To.x, op.To.y, op.To.z]);
+                            Debug.Log("Nari fin");
                             break;
-                        }
-                        if (i == opMochigomaIdx.Count - 1)
-                        {
-                            koma_on_board3D[op.To.x, op.To.y, op.To.z] = null;
-                            koma_on_board2D[op.To.x, op.To.y, op.To.z] = null;
                         }
                     }
                 }
             }
-
+            else
+            {
+                koma_on_board3D[op.To.x, op.To.y, op.To.z] = null;
+                koma_on_board2D[op.To.x, op.To.y, op.To.z] = null;
+            }
+            boardstate[op.To.x, op.To.y, op.To.z] = -op.Turn * (int)op.Get;
             ChangeTurn();
         }
         public void Matta()

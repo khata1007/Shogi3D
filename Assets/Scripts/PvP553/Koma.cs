@@ -274,18 +274,16 @@ namespace PvP553
         public void PutKoma(int o, Kind kind, int x, int y, int z) //owner, 駒の種類, x, y, z, 拡大縮小
         {
             int k = (int)kind; //kindにあたる駒のpiecesにおける添え字番号を計算
-            koma3D[x, y, z] = Instantiate<MakeKomaPrefs.KomaPrefab>(pieces[k], pieces3DTransform);
+            koma3D[x, y, z] = Instantiate(pieces[k], pieces3DTransform);
             koma3D[x, y, z].gameObject.layer = koma3D[x, y, z].transform.parent.gameObject.layer;
             koma3D[x, y, z].transform.localPosition = new Vector3(x, y - 0.5f, z);
             if (o == -1) koma3D[x, y, z].transform.eulerAngles = new Vector3(0, 180, 0);
-            koma3D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
             koma3D[x, y, z].gameObject.SetLayerRecursively(11);
 
             koma2D[x, y, z] = Instantiate(pieces2D[k], pieces2DTransform);
             koma2D[x, y, z].gameObject.layer = koma2D[x, y, z].transform.parent.gameObject.layer;
             koma2D[x, y, z].transform.localPosition = new Vector3((x - (xLength - 1) / 2), 0, ((z - (zLength - 1) / 2) - (1 - y) * (zLength + 1)));
             if (o == -1) koma2D[x, y, z].transform.Rotate(new Vector3(0, 180, 0));
-            koma2D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
             koma2D[x, y, z].gameObject.SetLayerRecursively(10);
 
             boardstate[x, y, z] = (int)kind * o;
@@ -295,18 +293,6 @@ namespace PvP553
         {
             koma3D.ChangeMat();
             koma2D.ChangeMat();
-
-            // Text targetText3D = koma3D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
-
-            // string kind = targetText3D.text;
-            // targetText3D.text = nari[kind];
-
-            // targetText3D = koma3D.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>();
-            // targetText3D.text = nari[kind];
-
-            // Text targetText2D = koma2D.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
-            // targetText2D.text = nari[kind];
-
 
             //return komaName_to_kind[nari[kind]]; //正値を返すので手番に応じて呼び出し元で-1倍してね
             int ret = koma2D.Komakind + diff_nari > Enum.GetValues(typeof(Kind)).Length + 1 ? koma2D.Komakind : koma2D.Komakind + diff_nari;
