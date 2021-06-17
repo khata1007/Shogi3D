@@ -13,7 +13,7 @@ namespace MakeKomaPrefs
         int cnt = 0;
 
         // Start is called before the first frame update
-        void Start()
+        void Awake()
         {
             InitVars(Sunpou.Kind.Gyo);
             var filter = GetComponent<MeshFilter>();

@@ -1285,7 +1285,6 @@ namespace PvP553
                         {
                             MochigomaRemove(i, op.Turn);
                             koma.PutKoma(-op.Turn, (Koma.Kind)Math.Abs(search), op.To.x, op.To.y, op.To.z);
-                            Debug.Log("PutKoma fin");
                             if (op.Get >= Koma.Kind.To) koma.Nari(koma_on_board3D[op.To.x, op.To.y, op.To.z], koma_on_board2D[op.To.x, op.To.y, op.To.z]);
                             Debug.Log("Nari fin");
                             break;
