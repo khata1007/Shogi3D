@@ -240,9 +240,17 @@ namespace PvP553
                 {
                     if (!CheckLegal(boardstate[fromx, fromy, fromz], new Vector3Int(fromx, fromy, fromz), new Vector3Int(pushx, pushy, pushz))) return; //合法手でなければreturn
 
-                    if ((pushz >= 7 && boardstate[fromx, fromy, fromz] == 3) || (pushz <= 1 && boardstate[fromx, fromy, fromz] == -3)) boardstate[fromx, fromy, fromz] = koma.Nari(koma_on_board3D[fromx, fromy, fromz], koma_on_board2D[fromx, fromy, fromz]) * turn;
-                    else if ((pushz >= zLength - 1 && (int)Koma.Kind.Fu <= boardstate[fromx, fromy, fromz] && boardstate[fromx, fromy, fromz] <= (int)Koma.Kind.Hi) ||
-                             (pushz <= 0 && -(int)Koma.Kind.Hi <= boardstate[fromx, fromy, fromz] && boardstate[fromx, fromy, fromz] <= -(int)Koma.Kind.Fu))
+                    if ( //桂馬で成らなければいけない場所に打った時
+                        (pushz >= zLength - 2 && boardstate[fromx, fromy, fromz] == (int)Koma.Kind.Kei) ||
+                        (pushz <= 1 && boardstate[fromx, fromy, fromz] == -(int)Koma.Kind.Kei)
+                    )
+                        boardstate[fromx, fromy, fromz] = koma.Nari(koma_on_board3D[fromx, fromy, fromz], koma_on_board2D[fromx, fromy, fromz]) * turn;
+                    else if ( //まだ成っていない駒に対して成れる位置にある駒を動かした時または成れる位置に向かって駒を動かしたとき
+                        (fromz == zLength - 1 && turn == 1 && boardstate[fromx, fromy, fromz] <= (int)Koma.Kind.Hi) ||
+                        (pushz >= zLength - 1 && (int)Koma.Kind.Fu <= boardstate[fromx, fromy, fromz] && boardstate[fromx, fromy, fromz] <= (int)Koma.Kind.Hi) ||
+                        (fromz == 0 && turn == -1 && -boardstate[fromx, fromy, fromz] <= (int)Koma.Kind.Hi) ||
+                        (pushz <= 0 && -(int)Koma.Kind.Hi <= boardstate[fromx, fromy, fromz] && boardstate[fromx, fromy, fromz] <= -(int)Koma.Kind.Fu)
+                    )
                     {
                         //成るかどうか聞く
                         mouseDetectable = false;
@@ -393,9 +401,6 @@ namespace PvP553
 
         public void ChangeDimension()
         {
-            // Debug.Log("fuck");
-
-
             // is3D = !is3D;
             // cameraMover.CameraMovable = !cameraMover.CameraMovable;
             // for (int x = 0; x < xLength; x++)
@@ -944,7 +949,7 @@ namespace PvP553
             //詰みの判定
             //王手をかけている駒を取れるなら問題なし
             //効きのない場所に王が移動できればよし
-            //上記を満たすなら張り駒ができなきゃ詰み
+            //上記を満たさなければ適切な張り駒ができなきゃ詰み
             List<Vector3Int> ouMoveList = Koma.getKomaMove(8);
             bool tsumi = true;
             Vector3Int oute = CheckOute();
@@ -965,27 +970,9 @@ namespace PvP553
                 }
                 if (turn == 1)
                 {
-                    Vector3Int diff = oute - opOuPos; //王と王手をかけている駒の座標の差
-                    if (opReachablePieces[oute.x, oute.y, oute.z] > 0) //相手の駒で王手をかけてる駒を取れる駒が存在する場合
+                    //相手の駒で王手をかけてる駒を取れる駒が存在する場合
+                    if (opReachablePieces[oute.x, oute.y, oute.z] > 0)
                     {
-                        /*
-                        //王で取りに行った場合は取りに行った場所に効いている駒が無ければセーフ
-                        if (Math.Abs(diff.x) <= 1 && Math.Abs(diff.y) <= 1 && Math.Abs(diff.z) <= 1)
-                        {
-                            int temp = work[oute.x, oute.y, oute.z];
-                            work[oute.x, oute.y, oute.z] = work[opOuPos.x, opOuPos.y, opOuPos.z];
-                            work[opOuPos.x, opOuPos.y, opOuPos.z] = 0;
-                            Debug.Log("王手の駒: " + oute);
-                            if(CheckOute(work, oute).x == -1)
-                            {
-                                tsumi = false;
-                                Debug.Log("王が取っても生き残れるよ");
-                            }
-                            work[opOuPos.x, opOuPos.y, opOuPos.z] = work[oute.x, oute.y, oute.z];
-                            work[oute.x, oute.y, oute.z] = temp;
-                        }
-                        */
-
                         //取った結果、王が取られなければセーフ
                         for (int x = 0; x < xLength; x++)
                         {
@@ -993,10 +980,10 @@ namespace PvP553
                             {
                                 for (int z = 0; z < zLength; z++)
                                 {
-                                    if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), oute))
+                                    if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), oute))
                                     {
-                                        //自分が王手をかけている駒を取れる相手の駒全てに対し, 実際に王手の駒を取ると王が取られてしまわないかチェック
-                                        bool isOu = (Math.Abs(work[x, y, z]) == 8 || Math.Abs(work[x, y, z]) == 9) ? true : false;
+                                        //自分が王手をかけている駒を取れる相手の駒全てに対し, 実際に相手が王手の駒を取ると相手の王が取られてしまわないかチェック
+                                        bool isOu = (work[x, y, z] == -(int)Koma.Kind.Ou || work[x, y, z] == -(int)Koma.Kind.Gyo) ? true : false;
                                         int temp = work[oute.x, oute.y, oute.z];
                                         work[oute.x, oute.y, oute.z] = work[x, y, z];
                                         work[x, y, z] = 0;
@@ -1018,25 +1005,29 @@ namespace PvP553
                         }
                     }
                     //王が他に効き駒のないマスに移動できる場合
-                    for (int dx = -1; dx <= 1; dx++)
+                    List<Vector3Int> ouMove = Koma.getKomaMove((int)Koma.Kind.Gyo);
+                    foreach (Vector3Int move in ouMove)
                     {
-                        for (int dy = -1; dy <= 1; dy++)
+                        Vector3Int next = opOuPos + move;
+                        if (CheckBound(next) && work[next.x, next.y, next.z] * turn <= 0)
                         {
-                            for (int dz = -1; dz <= 1; dz++)
+                            //実際に動かした後、駒の利きが無くなったら tsumi = false
+                            int temp = work[next.x, next.y, next.z];
+                            work[next.x, next.y, next.z] = work[opOuPos.x, opOuPos.y, opOuPos.z];
+                            work[opOuPos.x, opOuPos.y, opOuPos.z] = 0;
+                            if (CheckOute(work, next).x == -1)
                             {
-                                Vector3Int next = opOuPos + new Vector3Int(dx, dy, dz);
-                                if (dx == 0 && dy == 0 && dz == 0) continue;
-                                if (next != oute && CheckBound(next) && work[next.x, next.y, next.z] == 0 && myReachablePieces[next.x, next.y, next.z] == 0)
-                                {
-                                    Debug.Log("逃げ場があるよ");
-                                    tsumi = false;
-                                }
+                                tsumi = false;
+                                Debug.Log("後手の王が" + next + "に逃げられるよ");
                             }
+                            work[opOuPos.x, opOuPos.y, opOuPos.z] = work[next.x, next.y, next.z];
+                            work[next.x, next.y, next.z] = temp;
                         }
                     }
-                    if (work[oute.x, oute.y, oute.z] != 3)
+                    //貼り駒ができるかどうか
+                    if (work[oute.x, oute.y, oute.z] != (int)Koma.Kind.Kei)
                     {
-                        //貼り駒ができるかどうか
+                        Vector3Int diff = oute - opOuPos; //王と王手をかけている駒の座標の差
                         int mx = Math.Max(Math.Abs(diff.x), Math.Max(Math.Abs(diff.y), Math.Abs(diff.z)));
                         Vector3Int inc = diff / mx;
                         for (Vector3Int loc = opOuPos + inc; loc != oute; loc += inc)
@@ -1054,7 +1045,7 @@ namespace PvP553
                                             work[x, y, z] = 0;
                                             if (CheckOute(work, opOuPos).x == -1)
                                             {
-                                                Debug.Log("張り駒ができるよ");
+                                                Debug.Log("後手は盤上の駒で張り駒ができるよ");
                                                 tsumi = false;
                                             }
                                             work[x, y, z] = work[loc.x, loc.y, loc.z];
@@ -1067,34 +1058,27 @@ namespace PvP553
                             {
                                 //locに置けるかどうかの判定（二歩は本来はダメになると思うので後で実装）
                                 //if(puttable(opMochigoma, loc)) tsumi = false
-                                Debug.Log("持ち駒で張り駒ができるよ");
-                                tsumi = false;
+                                int temp = work[loc.x, loc.y, loc.z];
+                                work[loc.x, loc.y, loc.z] = opMochigoma;
+                                if (CheckOute(work, opOuPos).x == -1)
+                                {
+                                    Debug.Log("後手は持ち駒で張り駒ができるよ");
+                                    tsumi = false;
+                                }
+                                else
+                                {
+                                    Debug.Log("後手は張り駒意味ないよ");
+                                }
+                                work[loc.x, loc.y, loc.z] = temp;
+                                break;
                             }
                         }
                     }
                 }
                 else
                 {
-                    Vector3Int diff = oute - myOuPos;
                     if (myReachablePieces[oute.x, oute.y, oute.z] > 0)
                     {
-                        /*
-                        //王で取りに行った場合は取りに行った場所に効いている駒が無ければセーフ
-                        if (Math.Abs(diff.x) <= 1 && Math.Abs(diff.y) <= 1 && Math.Abs(diff.z) <= 1)
-                        {
-                            int temp = work[oute.x, oute.y, oute.z];
-                            work[oute.x, oute.y, oute.z] = work[myOuPos.x, myOuPos.y, myOuPos.z];
-                            work[myOuPos.x, myOuPos.y, myOuPos.z] = 0;
-                            if (CheckOute(work, oute).x == -1)
-                            {
-                                Debug.Log("王が取っても生き残れるよ");
-                                tsumi = false;
-                            }
-                            work[myOuPos.x, myOuPos.y, myOuPos.z] = work[oute.x, oute.y, oute.z];
-                            work[oute.x, oute.y, oute.z] = temp;
-                        }
-                        */
-
                         //王じゃないもので取りに行けて、その結果取られなければセーフ
                         for (int x = 0; x < xLength; x++)
                         {
@@ -1105,18 +1089,18 @@ namespace PvP553
                                     if (work[x, y, z] > 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), oute))
                                     {
                                         //自分が王手をかけている駒を取れる相手の駒全てに対し, 実際に王手の駒を取ると王が取られてしまわないかチェック
-                                        bool isOu = (8 <= Math.Abs(work[x, y, z]) && Math.Abs(work[x, y, z]) <= 9) ? true : false;
+                                        bool isOu = (work[x, y, z] == (int)Koma.Kind.Ou || work[x, y, z] == (int)Koma.Kind.Gyo) ? true : false;
                                         int temp = work[oute.x, oute.y, oute.z];
                                         work[oute.x, oute.y, oute.z] = work[x, y, z];
                                         work[x, y, z] = 0;
                                         if (isOu && CheckOute(work, oute).x == -1)
                                         {
-                                            Debug.Log("王が取っても生き残れるよ");
+                                            Debug.Log("先手は王が取っても生き残れるよ");
                                             tsumi = false;
                                         }
-                                        if (CheckOute(work, myOuPos).x == -1)
+                                        else if (!isOu && CheckOute(work, myOuPos).x == -1)
                                         {
-                                            Debug.Log("王以外のもので取れるよ");
+                                            Debug.Log("先手は王以外のもので取れるよ");
                                             tsumi = false;
                                         }
                                         work[x, y, z] = work[oute.x, oute.y, oute.z];
@@ -1126,25 +1110,30 @@ namespace PvP553
                             }
                         }
                     }
-                    for (int dx = -1; dx <= 1; dx++)
+                    //王が他に効き駒のないマスに移動できる場合
+                    List<Vector3Int> ouMove = Koma.getKomaMove((int)Koma.Kind.Ou);
+                    foreach (Vector3Int move in ouMove)
                     {
-                        for (int dy = -1; dy <= 1; dy++)
+                        Vector3Int next = myOuPos + move;
+                        if (CheckBound(next) && work[next.x, next.y, next.z] * turn <= 0)
                         {
-                            for (int dz = -1; dz <= 1; dz++)
+                            //実際に動かした後、駒の利きが無くなったら tsumi = false
+                            int temp = work[next.x, next.y, next.z];
+                            work[next.x, next.y, next.z] = work[myOuPos.x, myOuPos.y, myOuPos.z];
+                            work[myOuPos.x, myOuPos.y, myOuPos.z] = 0;
+                            if (CheckOute(work, next).x == -1)
                             {
-                                Vector3Int next = myOuPos + new Vector3Int(dx, dy, dz);
-                                if (dx == 0 && dy == 0 && dz == 0) continue;
-                                if (next != oute && CheckBound(next) && work[next.x, next.y, next.z] == 0 && opReachablePieces[next.x, next.y, next.z] == 0)
-                                {
-                                    Debug.Log("逃げ場があるよ");
-                                    tsumi = false;
-                                }
+                                tsumi = false;
+                                Debug.Log("先手の王が" + next + "に逃げられるよ");
                             }
+                            work[myOuPos.x, myOuPos.y, myOuPos.z] = work[next.x, next.y, next.z];
+                            work[next.x, next.y, next.z] = temp;
                         }
                     }
-                    if (work[oute.x, oute.y, oute.z] != -3)
+                    //貼り駒ができるかどうか
+                    if (work[oute.x, oute.y, oute.z] != -(int)Koma.Kind.Kei)
                     {
-                        //貼り駒ができるかどうか
+                        Vector3Int diff = oute - myOuPos; //王と王手をかけている駒の座標の差
                         int mx = Math.Max(Math.Abs(diff.x), Math.Max(Math.Abs(diff.y), Math.Abs(diff.z)));
                         Vector3Int inc = diff / mx;
 
@@ -1156,20 +1145,20 @@ namespace PvP553
                                 {
                                     for (int z = 0; z < zLength; z++)
                                     {
-                                        if (work[x, y, z] > 0 && CheckMovable_Specific(work, work[x, y, z], turn, new Vector3Int(x, y, z), loc))
+                                        Debug.Log(loc);
+                                        if (work[x, y, z] > 0 && CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), loc))
                                         {
                                             int temp = work[loc.x, loc.y, loc.z];
                                             work[loc.x, loc.y, loc.z] = work[x, y, z];
                                             work[x, y, z] = 0;
                                             if (CheckOute(work, myOuPos).x == -1)
                                             {
-                                                Debug.Log("張り駒ができるよ");
+                                                Debug.Log("先手は盤上の駒で張り駒ができるよ");
                                                 tsumi = false;
                                             }
                                             work[x, y, z] = work[loc.x, loc.y, loc.z];
                                             work[loc.x, loc.y, loc.z] = temp;
                                         }
-                                        else if (work[x, y, z] == 7) Debug.Log(work[x, y, z] + " at " + new Vector3Int(x, y, z) + "cannot reach " + loc);
                                     }
                                 }
                             }
@@ -1177,8 +1166,19 @@ namespace PvP553
                             {
                                 //locに置けるかどうかの判定（二歩は本来はダメになると思うので後で実装）
                                 //if(puttable(myMochigoma, loc)) tsumi = false;
-                                Debug.Log("持ち駒で張り駒ができるよ");
-                                tsumi = false;
+                                int temp = work[loc.x, loc.y, loc.z];
+                                work[loc.x, loc.y, loc.z] = myMochigoma;
+                                if (CheckOute(work, myOuPos).x == -1)
+                                {
+                                    Debug.Log("先手は持ち駒で張り駒ができるよ");
+                                    tsumi = false;
+                                }
+                                else
+                                {
+                                    Debug.Log("先手は張り駒意味ないよ");
+                                }
+                                work[loc.x, loc.y, loc.z] = temp;
+                                break;
                             }
                         }
                     }
