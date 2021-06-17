@@ -241,6 +241,7 @@ namespace PvP553
             pieces2DTransform = this.transform.GetChild(1).gameObject.transform;
 
             pieces3DTransform.localScale = new Vector3(komaScale3D, komaScale3D, komaScale3D);
+            pieces2DTransform.localScale = new Vector3(komaScale2D, komaScale2D, komaScale2D);
         }
 
         public async UniTask<bool> CheckNari()
@@ -272,8 +273,6 @@ namespace PvP553
 
         public void PutKoma(int o, Kind kind, int x, int y, int z) //owner, 駒の種類, x, y, z, 拡大縮小
         {
-            Transform pieces3DTransform = this.transform.GetChild(0).gameObject.transform;
-            Transform pieces2DTransform = this.transform.GetChild(1).gameObject.transform;
             int k = (int)kind; //kindにあたる駒のpiecesにおける添え字番号を計算
             koma3D[x, y, z] = Instantiate<MakeKomaPrefs.KomaPrefab>(pieces[k], pieces3DTransform);
             koma3D[x, y, z].gameObject.layer = koma3D[x, y, z].transform.parent.gameObject.layer;
@@ -284,13 +283,11 @@ namespace PvP553
 
             koma2D[x, y, z] = Instantiate(pieces2D[k], pieces2DTransform);
             koma2D[x, y, z].gameObject.layer = koma2D[x, y, z].transform.parent.gameObject.layer;
-            koma2D[x, y, z].transform.localPosition = new Vector3((x - (xLength - 1) / 2) * komaScale2D, 0, ((z - (zLength - 1) / 2) - (1 - y) * (zLength + 1)) * komaScale2D);
+            koma2D[x, y, z].transform.localPosition = new Vector3((x - (xLength - 1) / 2), 0, ((z - (zLength - 1) / 2) - (1 - y) * (zLength + 1)));
             if (o == -1) koma2D[x, y, z].transform.Rotate(new Vector3(0, 180, 0));
             koma2D[x, y, z].GetComponent<Renderer>().material.color = komaColor[y];
-            koma2D[x, y, z].gameObject.SetActive(true);
-
-            koma2D[x, y, z].transform.localScale = new Vector3(komaScale2D, komaScale2D, komaScale2D);
             koma2D[x, y, z].gameObject.SetLayerRecursively(10);
+
             boardstate[x, y, z] = (int)kind * o;
         }
 

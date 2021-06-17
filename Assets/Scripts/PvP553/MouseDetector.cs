@@ -41,27 +41,24 @@ namespace PvP553
             game.UnActivateChoosingGrid();
         }
 
-        public void OnDimensionButtonClick()
-        {
-            if (game.MouseDetectable)
-            {
-                game.ChangeDimension();
-                Text target = changeDimensionButton.transform.GetChild(0).GetComponent<Text>();
-                if (target.text[0] == '3') target.text = "2D";
-                else target.text = "3D";
-            }
-        }
-
         public void OnNariButtonClick(int n)
         {
             Koma.Nariflg = n;
-            Debug.Log(n);
         }
 
         public void OnReverseButtonClick()
         {
             game.ReverseView();
         }
-        
+
+        public void OnMattaButtonClick()
+        {
+            game.Matta();
+        }
+        public void OnFinishButtonClick()
+        {
+            //セーブしてシーン遷移
+            Debug.Log("FinishButton Clicked");
+        }
     }
 }
