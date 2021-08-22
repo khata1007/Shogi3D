@@ -19,6 +19,7 @@ namespace PvP553
             new Color(125/255.0f, 109/255.0f, 90/255.0f),
             //new Color(142/255.0f, 129/255.0f, 106/255.0f),
         };
+        //amezaki
 
 
         [SerializeField, Range(0.0f, 0.03f)] private float frameWidth3D = 0.01f;
