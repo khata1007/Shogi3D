@@ -59,6 +59,9 @@ namespace PvP553
         public Camera underCamera;
         public Camera centerRightCamera;
 
+        public AudioSource putKomaNormal;
+        public AudioSource putKomaShuban;
+
 
         //3Dの箱とフレーム、2Dの箱とフレーム、移動可能場所の赤い円
         private GameObject[,,] orangeBox3D;
@@ -334,9 +337,8 @@ namespace PvP553
                     string winner = (turn == 1) ? "先手" : "後手";
                     Debug.Log(winner + "の勝ち");
                 }
+                putKomaNormal.Play();
                 ChangeTurn();
-
-                //for (int i = 0; i < 10000000; i++) if(i == 1000000-1) Debug.Log("Done"); //どんくらいの計算量を許容できるかのテスト -> 10^7が限界
             }
             else if (boardstate[pushx, pushy, pushz] * turn > 0) //手番のプレイヤーが自分の駒を選択した時
             {

@@ -16,6 +16,9 @@ namespace Choose
         public GameObject[] audioSources = new GameObject[3];
         public GameObject dropDown;
 
+        public GameObject MainPanel;
+        public GameObject SettingPanel;
+
         public void OnBGMChanged()
         {
             Debug.Log("before: " + audioPlaying);
@@ -24,6 +27,14 @@ namespace Choose
             audioSources[audioPlaying].GetComponent<AudioSource>().Play();
             Debug.Log("after: " + audioPlaying);
         }
+
+        public void OnSettingButtonClicked(){
+            this.SettingPanel.SetActive(true);
+        }
+        public void OnSettingFinishButtonClicked(){
+            this.SettingPanel.SetActive(false);
+        }
+
         public void ChoosePvP993()
         {
             xLength = 9;
@@ -42,9 +53,10 @@ namespace Choose
 
         public void Start()
         {
-            DontDestroyOnLoad(audioSources[0]);
-            DontDestroyOnLoad(audioSources[1]);
-            DontDestroyOnLoad(audioSources[2]);
+            foreach(GameObject source in audioSources){
+                source.transform.parent = null;
+                DontDestroyOnLoad(source);
+            }
         }
     }
 
