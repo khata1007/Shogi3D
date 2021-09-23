@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 8966210933249306520}
   - component: {fileID: 8966210933249306523}
   - component: {fileID: 8966210933249306521}
-  - component: {fileID: 8966210933249306532}
+  - component: {fileID: 2066600326892800015}
   m_Layer: 5
   m_Name: gridButton
   m_TagString: Untagged
@@ -163,7 +163,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 8966210933249306532}
+  m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
@@ -178,7 +178,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8966210933249306532
+--- !u!114 &2066600326892800015
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -187,9 +187,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8966210933249306527}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 807e19e1fb57be7419a0eeb20fafafb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_ShowMaskGraphic: 1
