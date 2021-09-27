@@ -24,8 +24,6 @@ namespace PvP553
         public Record(string recordStr)
         {
             string[] contents = recordStr.Split(new char[] { '|' });
-            Debug.Log(recordStr);
-            Debug.Log(contents);
             foreach (string s in contents) Debug.Log(s);
             turn = Convert.ToInt32(contents[0]);
             if (contents[1][0] == '-') from = new Vector3Int(-1, -1, -1);
@@ -1281,9 +1279,10 @@ namespace PvP553
                 {
                     for (int choose = 0; choose < myMochigomaInstance.Count; choose++)
                     {
-                        if (myMochigomaIdx[choose] == (int)rec.ToState)
+                        if (myMochigomaIdx[choose] == (int)rec.ToState * rec.Turn)
                         {
                             MochigomaRemove(choose, rec.Turn);
+                            Debug.Log("持ち駒置いたよ");
                             break;
                         }
                     }
@@ -1292,9 +1291,10 @@ namespace PvP553
                 {
                     for (int choose = 0; choose < opMochigomaInstance.Count; choose++)
                     {
-                        if (opMochigomaIdx[choose] == (int)rec.ToState)
+                        if (opMochigomaIdx[choose] == (int)rec.ToState * rec.Turn)
                         {
                             MochigomaRemove(choose, rec.Turn);
+                            Debug.Log("持ち駒置いたよ");
                             break;
                         }
                     }
