@@ -15,13 +15,11 @@ namespace MakeKomaPrefs
         // Start is called before the first frame update
         void Awake()
         {
-            Debug.Log("start called");
             InitVars(Sunpou.Kind.Fu);
             var filter = GetComponent<MeshFilter>();
             filter.sharedMesh = mesh;
             var renderer = GetComponent<MeshRenderer>();
             renderer.material = _mat[0];
-            Debug.Log("start fin");
         }
 
         private void Update()
