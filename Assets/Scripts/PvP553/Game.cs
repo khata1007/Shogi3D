@@ -1259,6 +1259,12 @@ namespace PvP553
             {
                 ProcessGameFromOneRecord(rec);
             }
+            if (record.Count != 0)
+            {
+                Record last = record[record.Count - 1];
+                greenBox3D[last.To.x, last.To.y, last.To.z].SetActive(true);
+                greenBox2D[last.To.x, last.To.y, last.To.z].SetActive(true);
+            }
         }
         public void SaveGame()
         {
