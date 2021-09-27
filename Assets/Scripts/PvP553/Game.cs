@@ -28,7 +28,8 @@ namespace PvP553
             Debug.Log(contents);
             foreach (string s in contents) Debug.Log(s);
             turn = Convert.ToInt32(contents[0]);
-            from = new Vector3Int(Convert.ToInt32(contents[1]) / 100, Convert.ToInt32(contents[1]) / 10 % 10, Convert.ToInt32(contents[1]) % 10);
+            if (contents[1][0] == '-') from = new Vector3Int(-1, -1, -1);
+            else from = new Vector3Int(Convert.ToInt32(contents[1]) / 100, Convert.ToInt32(contents[1]) / 10 % 10, Convert.ToInt32(contents[1]) % 10);
             to = new Vector3Int(Convert.ToInt32(contents[2]) / 100, Convert.ToInt32(contents[2]) / 10 % 10, Convert.ToInt32(contents[2]) % 10);
             fromState = (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Convert.ToInt32(contents[3]));
             toState = (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Convert.ToInt32(contents[4]));
@@ -223,18 +224,6 @@ namespace PvP553
                 PlayerPrefs.DeleteKey("playSavedGame");
                 LoadGame();
             }
-
-            ProcessGameFromOneRecord(
-                new Record
-                (
-                    1,
-                    new Vector3Int(0, 1, 1),
-                    Koma.Kind.Fu,
-                    new Vector3Int(0, 1, 2),
-                    Koma.Kind.To,
-                    Koma.Kind.Emp
-                )
-            );
         }
 
         // Update is called once per frame
@@ -243,14 +232,14 @@ namespace PvP553
 
         }
 
-        public async void ChooseGrid(int idx) //実際に手番が進むメソッド
+        public async void ChooseGrid(int idx) //実際に手番が進むメソッド.
         {
             if (!mouseDetectable) return;
             int pushz = idx % 10;
             int pushy = (idx / 10) % 10;
             int pushx = (idx / 100) % 10;
 
-            //選択マスが移動可能マス（赤丸の表示されているマス）の場合は駒を移動させる ここで実際に手番が進む
+            //選択マスが移動可能マス（赤丸の表示されているマス）の場合は駒を移動させる ここで実際に手番が進む Recordを使って進める形に書き換えたい
             if (movableGrid2D[pushx, pushy, pushz].activeSelf)
             {
                 Koma.Kind got = Koma.Kind.Emp; //取った駒
