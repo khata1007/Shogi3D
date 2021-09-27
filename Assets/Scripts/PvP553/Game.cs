@@ -21,6 +21,19 @@ namespace PvP553
             fromState = fs; toState = ts;
             get = g;
         }
+        public Record(string recordStr)
+        {
+            string[] contents = recordStr.Split(new char[] { '|' });
+            Debug.Log(recordStr);
+            Debug.Log(contents);
+            foreach (string s in contents) Debug.Log(s);
+            turn = Convert.ToInt32(contents[0]);
+            from = new Vector3Int(Convert.ToInt32(contents[1]) / 100, Convert.ToInt32(contents[1]) / 10 % 10, Convert.ToInt32(contents[1]) % 10);
+            to = new Vector3Int(Convert.ToInt32(contents[2]) / 100, Convert.ToInt32(contents[2]) / 10 % 10, Convert.ToInt32(contents[2]) % 10);
+            fromState = (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Convert.ToInt32(contents[3]));
+            toState = (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Convert.ToInt32(contents[4]));
+            get = (Koma.Kind)Enum.ToObject(typeof(Koma.Kind), Convert.ToInt32(contents[5]));
+        }
         public int Turn { get { return turn; } }
         public Vector3Int From { get { return from; } }
         public Vector3Int To { get { return to; } }
@@ -205,8 +218,23 @@ namespace PvP553
             }
 
             nariConfirmCanvas.SetActive(false);
-            Vector3Int temp = myOuPos;
-            Debug.Log(gridButton2D[0, 0, 0].transform.position);
+            if (PlayerPrefs.HasKey("playSavedGame"))
+            {
+                PlayerPrefs.DeleteKey("playSavedGame");
+                LoadGame();
+            }
+
+            ProcessGameFromOneRecord(
+                new Record
+                (
+                    1,
+                    new Vector3Int(0, 1, 1),
+                    Koma.Kind.Fu,
+                    new Vector3Int(0, 1, 2),
+                    Koma.Kind.To,
+                    Koma.Kind.Emp
+                )
+            );
         }
 
         // Update is called once per frame
@@ -215,9 +243,8 @@ namespace PvP553
 
         }
 
-        public async void ChooseGrid(int idx) //実際に手番が進むメソッド 作業のしやすさを考慮してUpdate()直下に配置
+        public async void ChooseGrid(int idx) //実際に手番が進むメソッド
         {
-            Debug.Log(idx + " choosed");
             if (!mouseDetectable) return;
             int pushz = idx % 10;
             int pushy = (idx / 10) % 10;
@@ -241,8 +268,6 @@ namespace PvP553
                 }
                 if (fromx == -1 || fromy == -1 || fromz == -1)
                 {
-                    //Debug.Log("Choosed from Mochigoma");
-
                     int choose = -1;
                     if (turn == 1) for (int i = 0; i < myMochigomaBox.Count; i++) { if (myMochigomaBox[i].activeSelf) choose = i; }
                     else for (int i = 0; i < opMochigomaBox.Count; i++) { if (opMochigomaBox[i].activeSelf) choose = i; }
@@ -426,113 +451,6 @@ namespace PvP553
             }
         }
 
-        public void ChangeDimension()
-        {
-            // is3D = !is3D;
-            // cameraMover.CameraMovable = !cameraMover.CameraMovable;
-            // for (int x = 0; x < xLength; x++)
-            // {
-            //     for (int y = 0; y < yLength; y++)
-            //     {
-            //         for (int z = 0; z < zLength; z++)
-            //         {
-            //             if (koma_on_board3D[x, y, z] != null) koma_on_board3D[x, y, z].gameObject.SetActive(!koma_on_board3D[x, y, z].gameObject.activeSelf);
-            //             if (koma_on_board2D[x, y, z] != null) koma_on_board2D[x, y, z].gameObject.SetActive(!koma_on_board2D[x, y, z].gameObject.activeSelf);
-            //         }
-            //     }
-            // }
-
-            // for (int y = 0; y < yLength; y++)
-            // {
-            //     for (int z = 0; z <= zLength; z++)
-            //     {
-            //         frameX3D[y, z].SetActive(!frameX3D[y, z].activeSelf);
-            //         frameX2D[y, z].SetActive(!frameX2D[y, z].activeSelf);
-            //     }
-            // }
-            // for (int y = 0; y < yLength; y++)
-            // {
-            //     for (int x = 0; x <= xLength; x++)
-            //     {
-            //         frameZ3D[y, x].SetActive(!frameZ3D[y, x].activeSelf);
-            //         frameZ2D[y, x].SetActive(!frameZ2D[y, x].activeSelf);
-            //     }
-            // }
-
-            // if (frameZ2D[0, 0].activeSelf) //2Dモードに切り替えた場合はカメラを固定
-            // {
-            //     float c = 4.5f;
-            //     prevCameraPos = cameraMover.MainCameraTransformPosition;
-            //     cameraMover.MainCamera2DSetting(new Vector3(c, 12, c), new Vector3(c, 0, c));
-            // }
-            // else cameraMover.MainCameraTransformPosition = prevCameraPos;
-
-            // //3Dと2DのorangeBox, greenBox, movableGridのactiveを（必要なら）入れ替える
-            // for (int x = 0; x < xLength; x++)
-            // {
-            //     for (int y = 0; y < yLength; y++)
-            //     {
-            //         for (int z = 0; z < zLength; z++)
-            //         {
-            //             bool active3D, active2D;
-            //             active3D = orangeBox3D[x, y, z].activeSelf;
-            //             active2D = orangeBox2D[x, y, z].activeSelf;
-            //             if (active3D & !active2D)
-            //             {
-            //                 orangeBox2D[x, y, z].SetActive(true);
-            //                 orangeBox3D[x, y, z].SetActive(false);
-            //             }
-            //             else if (!active3D & active2D)
-            //             {
-            //                 orangeBox2D[x, y, z].SetActive(false);
-            //                 orangeBox3D[x, y, z].SetActive(true);
-            //             }
-
-            //             active3D = greenBox3D[x, y, z].activeSelf;
-            //             active2D = greenBox2D[x, y, z].activeSelf;
-            //             if (active3D & !active2D)
-            //             {
-            //                 greenBox2D[x, y, z].SetActive(true);
-            //                 greenBox3D[x, y, z].SetActive(false);
-            //             }
-            //             else if (!active3D & active2D)
-            //             {
-            //                 greenBox2D[x, y, z].SetActive(false);
-            //                 greenBox3D[x, y, z].SetActive(true);
-            //             }
-
-            //             active3D = movableGrid3D[x, y, z].activeSelf;
-            //             active2D = movableGrid2D[x, y, z].activeSelf;
-            //             if (active3D & !active2D)
-            //             {
-            //                 movableGrid2D[x, y, z].SetActive(true);
-            //                 movableGrid3D[x, y, z].SetActive(false);
-            //             }
-            //             else if (!active3D & active2D)
-            //             {
-            //                 movableGrid2D[x, y, z].SetActive(false);
-            //                 movableGrid3D[x, y, z].SetActive(true);
-            //             }
-
-
-            //         }
-            //     }
-            // }
-
-            // //gridButton の enabled を入れ替える
-            // for (int x = 0; x < xLength; x++)
-            // {
-            //     for (int y = 0; y < yLength; y++)
-            //     {
-            //         for (int z = 0; z < zLength; z++)
-            //         {
-            //             gridButton2D[x, y, z].enabled = !gridButton2D[x, y, z].enabled;
-            //         }
-            //     }
-            // }
-
-        }
-
         private void ChangeTurn() //手番を終えたプレイヤーの持ち駒を選択できなくする 
         {
             if (turn == 1)
@@ -711,7 +629,7 @@ namespace PvP553
             komainst.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
         }
 
-        //持ち駒を生成して整列するメソッド
+        //持ち駒を生成して整列するメソッド. aimturn の人が駒を取った場合の挙動
         private void MochigomaGenerate(Koma.Kind k, int aimturn = 0)
         {
             int kind = (int)k;
@@ -773,7 +691,6 @@ namespace PvP553
                 {
                     for (int i = myMochigomaIdx.Count - 2; i >= ins; i--)
                     {
-                        Debug.Log(i);
                         //Vector3 pos = myMochigomaInstance[i + 1].transform.localPosition; //例えば銀がi, 桂馬がi+1のとき: まずは桂馬の位置を記録
                         MakeKomaPrefs.KomaPrefab2D inst = myMochigomaInstance[i + 1]; //桂馬のインスタンスも記憶
                         int idx = myMochigomaIdx[i + 1];
@@ -857,7 +774,7 @@ namespace PvP553
             MochigomaRelocate();
         }
 
-        private void MochigomaRelocate() //画面右端を超えないように持ち駒の位置調整
+        private void MochigomaRelocate() //持ち駒の画面上の位置を現在の持ち駒のリストから決定する
         {
             float newScale = 1.0f;
             //if (opMochigomaInstance.Count >= 20) newScale /= opMochigomaInstance.Count;
@@ -1173,7 +1090,6 @@ namespace PvP553
                                 {
                                     for (int z = 0; z < zLength; z++)
                                     {
-                                        Debug.Log(loc);
                                         if (work[x, y, z] > 0 && CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), loc))
                                         {
                                             int temp = work[loc.x, loc.y, loc.z];
@@ -1288,7 +1204,6 @@ namespace PvP553
                             MochigomaRemove(i, op.Turn);
                             koma.PutKoma(-op.Turn, (Koma.Kind)Math.Abs(search), op.To.x, op.To.y, op.To.z);
                             if (op.Get >= Koma.Kind.To) koma.Nari(koma_on_board3D[op.To.x, op.To.y, op.To.z], koma_on_board2D[op.To.x, op.To.y, op.To.z]);
-                            Debug.Log("Nari fin");
                             break;
                         }
                     }
@@ -1305,12 +1220,127 @@ namespace PvP553
         public void Matta()
         {
             if (record.Count > 0) Rewind();
-            //if (record.Count > 0) Rewind();
         }
 
-        public void ReverseView()
+        // Record のフィールドたち
+        // int turn; -> 1 or -1
+        // Vector3Int from, to; 
+        // Koma.Kind fromState, toState;
+        // Koma.Kind get;
+
+        private List<Record> str2record(string str)
         {
-            //cameraMover.transform.eulerAngles += new Vector3(0, 180, 0);
+            List<Record> ret = new List<Record>();
+            string[] recordStrArr = str.Split(new char[] { ',' });
+            foreach (string recordStr in recordStrArr)
+            {
+                if (recordStr.Length == 0) continue;
+                Record nowrecord = new Record(recordStr);
+                ret.Add(nowrecord);
+            }
+            return ret;
+        }
+        private string record2str()
+        {
+            string ret = "";
+            foreach (Record rec in record)
+            {
+                ret += rec.Turn.ToString();
+                ret += '|';
+                ret += rec.From.x.ToString();
+                ret += rec.From.y.ToString();
+                ret += rec.From.z.ToString();
+                ret += '|';
+                ret += rec.To.x.ToString();
+                ret += rec.To.y.ToString();
+                ret += rec.To.z.ToString();
+                ret += '|';
+                ret += ((int)rec.FromState).ToString();
+                ret += '|';
+                ret += ((int)rec.ToState).ToString();
+                ret += '|';
+                ret += ((int)rec.Get).ToString();
+                ret += ',';
+            }
+            return ret;
+        }
+        private void LoadGame()
+        {
+            string data = PlayerPrefs.GetString("savedGame");
+            record = str2record(data);
+            foreach (Record rec in record)
+            {
+                ProcessGameFromOneRecord(rec);
+            }
+        }
+        public void SaveGame()
+        {
+            string data = record2str();
+            PlayerPrefs.SetString("savedGame", data);
+            PlayerPrefs.Save();
+        }
+
+        private void ProcessGameFromOneRecord(Record rec)
+        {
+            //常に変わるもの: turn, boardState, koma_on_board3D/2D
+            //たまに変わるもの: 持ち駒関連, my/opOuPos
+            boardstate[rec.To.x, rec.To.y, rec.To.z] = (int)rec.ToState * rec.Turn;
+            if (rec.From.x == -1)
+            {
+                koma.PutKoma(rec.Turn, rec.ToState, rec.To.x, rec.To.y, rec.To.z);
+                if (rec.Turn == 1)
+                {
+                    for (int choose = 0; choose < myMochigomaInstance.Count; choose++)
+                    {
+                        if (myMochigomaIdx[choose] == (int)rec.ToState)
+                        {
+                            MochigomaRemove(choose, rec.Turn);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int choose = 0; choose < opMochigomaInstance.Count; choose++)
+                    {
+                        if (opMochigomaIdx[choose] == (int)rec.ToState)
+                        {
+                            MochigomaRemove(choose, rec.Turn);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                boardstate[rec.From.x, rec.From.y, rec.From.z] = 0;
+                if (rec.Get != Koma.Kind.Emp)
+                {
+                    Destroy(koma_on_board3D[rec.To.x, rec.To.y, rec.To.z].gameObject);
+                    Destroy(koma_on_board2D[rec.To.x, rec.To.y, rec.To.z].gameObject);
+                    koma_on_board3D[rec.To.x, rec.To.y, rec.To.z] = null;
+                    koma_on_board2D[rec.To.x, rec.To.y, rec.To.z] = null;
+                    MochigomaGenerate(rec.Get, rec.Turn);
+                }
+                int dx = rec.To.x - rec.From.x;
+                int dy = rec.To.y - rec.From.y;
+                int dz = rec.To.z - rec.From.z;
+                koma_on_board3D[rec.From.x, rec.From.y, rec.From.z].transform.localPosition += new Vector3(dx, dy, dz);
+                koma_on_board2D[rec.From.x, rec.From.y, rec.From.z].transform.localPosition += new Vector3(dx, 0, dz + dy * (zLength + 1));
+                koma_on_board3D[rec.To.x, rec.To.y, rec.To.z] = koma_on_board3D[rec.From.x, rec.From.y, rec.From.z];
+                koma_on_board2D[rec.To.x, rec.To.y, rec.To.z] = koma_on_board2D[rec.From.x, rec.From.y, rec.From.z];
+                koma_on_board3D[rec.From.x, rec.From.y, rec.From.z] = null;
+                koma_on_board2D[rec.From.x, rec.From.y, rec.From.z] = null;
+
+                if (rec.FromState != rec.ToState) koma.Nari(koma_on_board3D[rec.To.x, rec.To.y, rec.To.z], koma_on_board2D[rec.To.x, rec.To.y, rec.To.z]);
+                if (rec.ToState == Koma.Kind.Ou || rec.ToState == Koma.Kind.Gyo)
+                {
+                    if (rec.Turn == 1) myOuPos = new Vector3Int(rec.To.x, rec.To.y, rec.To.z);
+                    else opOuPos = new Vector3Int(rec.To.x, rec.To.y, rec.To.z);
+                }
+            }
+            CalcReachableRange();
+            ChangeTurn();
         }
 
         public void UnActivateChoosingGrid()
@@ -1321,8 +1351,6 @@ namespace PvP553
                 {
                     for (int z = 0; z < zLength; z++)
                     {
-                        //greenBox3D[x, y, z].SetActive(false);
-                        //greenBox2D[x, y, z].SetActive(false);
                         movableGrid3D[x, y, z].SetActive(false);
                         movableGrid2D[x, y, z].SetActive(false);
                         orangeBox3D[x, y, z].SetActive(false);

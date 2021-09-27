@@ -152,7 +152,6 @@ namespace PvP553
                 g.transform.localScale = new Vector3(boardScale2D * xLength, 0.001f, boardScale2D * zLength);
                 g.layer = g.transform.parent.gameObject.layer;
             }
-            Debug.Log(ob2D[0, 0, 0].transform.position);
         }
 
         public void CreateFrame(GameObject[,] fx3D, GameObject[,] fz3D, GameObject[,] fx2D, GameObject[,] fz2D)
@@ -222,7 +221,6 @@ namespace PvP553
                     fz2D[y, x].SetActive(true);
                 }
             }
-            Debug.Log("2DFrame Created.");
         }
 
         public float BoardScale2D { set { boardScale2D = value; } }

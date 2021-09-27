@@ -20,7 +20,6 @@ namespace MakeKomaPrefs
         int komakind;
         protected void InitVars(Sunpou.Kind k)
         {
-            Debug.Log("Initvars called");
             komakind = (int)k;
             sunpou = new float[3];
             degs = new float[3];
@@ -101,7 +100,6 @@ namespace MakeKomaPrefs
             27, 29, 28,
         };
             mesh.RecalculateNormals();
-            Debug.Log("Initvars fin");
         }
 
         public void ChangeMat()
