@@ -14,8 +14,10 @@ namespace Choose
 
         private int gameMode = 0; //0...CPU戦, 1...対人戦
 
-        private int audioPlaying = 0;
-        public GameObject[] audioSources = new GameObject[3];
+        private int audioPlaying;
+
+        static AudioPlayer prevAudioPlayer = null;
+        public AudioPlayer audioPlayer;
         public GameObject dropDown;
 
         public GameObject mainPanel;
@@ -24,11 +26,15 @@ namespace Choose
 
         public void OnBGMChanged()
         {
+            int val = dropDown.GetComponent<Dropdown>().value;
+            if (PlayerPrefs.GetInt("BGMid", -1) == val) return;
             Debug.Log("before: " + audioPlaying);
-            audioSources[audioPlaying].GetComponent<AudioSource>().Stop();
-            audioPlaying = dropDown.GetComponent<Dropdown>().value;
-            audioSources[audioPlaying].GetComponent<AudioSource>().Play();
+            audioPlayer.stop();
+            audioPlaying = val;
+            audioPlayer.play(audioPlaying);
             Debug.Log("after: " + audioPlaying);
+            PlayerPrefs.SetInt("BGMid", val);
+            PlayerPrefs.Save();
         }
 
         public void OnSettingButtonClicked()
@@ -76,11 +82,18 @@ namespace Choose
         {
             settingPanel.SetActive(false);
             checkPlaySavedGameCanvas.SetActive(false);
-            foreach (GameObject source in audioSources)
+            audioPlaying = PlayerPrefs.GetInt("BGMid", 0);
+            if (prevAudioPlayer == null)
             {
-                source.transform.parent = null;
-                DontDestroyOnLoad(source);
+                prevAudioPlayer = audioPlayer;
+                audioPlayer.play(audioPlaying);
             }
+            else
+            {
+                Destroy(audioPlayer.gameObject);
+                audioPlayer = prevAudioPlayer;
+            }
+            dropDown.GetComponent<Dropdown>().value = PlayerPrefs.GetInt("BGMid", 0);
         }
     }
 
