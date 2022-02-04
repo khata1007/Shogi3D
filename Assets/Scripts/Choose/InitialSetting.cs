@@ -37,6 +37,11 @@ namespace Choose
             PlayerPrefs.Save();
         }
 
+        public void OnCreditButtonClicked()
+        {
+
+        }
+
         public void OnOthelloButtonClicked()
         {
             Application.OpenURL("https://unityroom.com/games/3dothello_demo");
