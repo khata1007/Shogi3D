@@ -37,6 +37,11 @@ namespace Choose
             PlayerPrefs.Save();
         }
 
+        public void OnOthelloButtonClicked()
+        {
+            Application.OpenURL("https://unityroom.com/games/3dothello_demo");
+        }
+
         public void OnSettingButtonClicked()
         {
             this.settingPanel.SetActive(true);
@@ -44,6 +49,11 @@ namespace Choose
         public void OnSettingFinishButtonClicked()
         {
             this.settingPanel.SetActive(false);
+        }
+
+        public void OnTutorialButtonClicked()
+        {
+
         }
 
         public void ChooseCPU553()
