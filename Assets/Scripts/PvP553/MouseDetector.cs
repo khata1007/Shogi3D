@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
@@ -12,27 +13,18 @@ namespace PvP553
         private int yLength = Choose.InitialSetting.yLength;
         private int zLength = Choose.InitialSetting.zLength;
 
-        public Button cancelgridChooseButton;
-        public Button changeDimensionButton;
-        public Button gridChooseButton;
-        public Button reverseButton; //180°視点を反転
-        public Button nariYesButton, nariNoButton;
+        public Canvas saveConfirmCanvas;
         public Game game;
         // Start is called before the first frame update
         void Start()
         {
-
+            saveConfirmCanvas.gameObject.SetActive(false);
         }
 
         // Update is called once per frame
         void Update()
         {
-            /*
-            if (game.MouseDetectable)
-            {
-                if (Input.GetMouseButtonUp(0)) Debug.Log("yeah");
-            }
-            */
+
         }
 
         public void OnCancelGridChooseButtonClick()
@@ -46,19 +38,28 @@ namespace PvP553
             Koma.Nariflg = n;
         }
 
-        public void OnReverseButtonClick()
-        {
-            game.ReverseView();
-        }
-
         public void OnMattaButtonClick()
         {
-            game.Matta();
+            if (game.MouseDetectable) game.Matta();
         }
         public void OnFinishButtonClick()
         {
             //セーブしてシーン遷移
-            Debug.Log("FinishButton Clicked");
+            if (game.MouseDetectable)
+            {
+                game.MouseDetectable = false;
+                saveConfirmCanvas.gameObject.SetActive(true);
+                Debug.Log("FinishButton Clicked");
+            }
+        }
+        public void OnSaveYesButtonClick()
+        {
+            game.SaveGame();
+            SceneManager.LoadScene("choose");
+        }
+        public void OnSaveNoButtonClick()
+        {
+            SceneManager.LoadScene("choose");
         }
     }
 }

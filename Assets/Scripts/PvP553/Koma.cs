@@ -273,7 +273,6 @@ namespace PvP553
 
         public void PutKoma(int o, Kind kind, int x, int y, int z) //owner, 駒の種類, x, y, z, 拡大縮小
         {
-            Debug.Log("PutKoma called");
             int k = (int)kind; //kindにあたる駒のpiecesにおける添え字番号を計算
             koma3D[x, y, z] = Instantiate(pieces[k], pieces3DTransform);
             koma3D[x, y, z].gameObject.layer = koma3D[x, y, z].transform.parent.gameObject.layer;
@@ -288,7 +287,6 @@ namespace PvP553
             koma2D[x, y, z].gameObject.SetLayerRecursively(10);
 
             boardstate[x, y, z] = (int)kind * o;
-            Debug.Log("PutKoma fin");
         }
 
         public int Nari(MakeKomaPrefs.KomaPrefab koma3D, MakeKomaPrefs.KomaPrefab2D koma2D)
@@ -298,7 +296,6 @@ namespace PvP553
 
             //return komaName_to_kind[nari[kind]]; //正値を返すので手番に応じて呼び出し元で-1倍してね
             int ret = koma2D.Komakind + diff_nari > Enum.GetValues(typeof(Kind)).Length + 1 ? koma2D.Komakind : koma2D.Komakind + diff_nari;
-            Debug.Log("ret: " + ret);
             return koma2D.Komakind + diff_nari > Enum.GetValues(typeof(Kind)).Length + 1 ? koma2D.Komakind : koma2D.Komakind + diff_nari;
         }
 
