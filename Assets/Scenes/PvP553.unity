@@ -1029,7 +1029,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 372406a784e9342499ae8ba30a5c3083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frameWidth3D: 0.01
+  frameWidth3D: 0.02
   frameWidth2D: 0.05
   orangeBoardPrefab3D: {fileID: 4732970784958368811, guid: 62181d7eb5bd09546805e018aa06a2ad,
     type: 3}
