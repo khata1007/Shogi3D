@@ -18,6 +18,8 @@ namespace Choose
 
         static AudioPlayer prevAudioPlayer = null;
         public AudioPlayer audioPlayer;
+        public Slider bgmSlider;
+        public Slider seSlider;
         public GameObject dropDown;
 
         public GameObject mainPanel;
@@ -33,8 +35,6 @@ namespace Choose
             audioPlaying = val;
             audioPlayer.play(audioPlaying);
             Debug.Log("after: " + audioPlaying);
-            PlayerPrefs.SetInt("BGMid", val);
-            PlayerPrefs.Save();
         }
 
         public void OnCreditButtonClicked()
@@ -53,6 +53,10 @@ namespace Choose
         }
         public void OnSettingFinishButtonClicked()
         {
+            PlayerPrefs.SetInt("BGMid", dropDown.GetComponent<Dropdown>().value);
+            PlayerPrefs.SetFloat("BGMVolume", bgmSlider.GetComponent<Slider>().value);
+            PlayerPrefs.SetFloat("SEVolume", seSlider.GetComponent<Slider>().value);
+            PlayerPrefs.Save();
             this.settingPanel.SetActive(false);
         }
 
@@ -98,6 +102,10 @@ namespace Choose
             settingPanel.SetActive(false);
             checkPlaySavedGameCanvas.SetActive(false);
             audioPlaying = PlayerPrefs.GetInt("BGMid", 0);
+            float defaultBGMVolume = PlayerPrefs.GetFloat("BGMVolume", 0.5f);
+            float defaultSEVolume = PlayerPrefs.GetFloat("SEVolume", 0.5f);
+            bgmSlider.GetComponent<Slider>().value = defaultBGMVolume;
+            seSlider.GetComponent<Slider>().value = defaultSEVolume;
             if (prevAudioPlayer == null)
             {
                 prevAudioPlayer = audioPlayer;
@@ -108,7 +116,12 @@ namespace Choose
                 Destroy(audioPlayer.gameObject);
                 audioPlayer = prevAudioPlayer;
             }
+            audioPlayer.GetComponent<AudioSource>().volume = defaultBGMVolume;
             dropDown.GetComponent<Dropdown>().value = PlayerPrefs.GetInt("BGMid", 0);
+        }
+        void Update()
+        {
+            audioPlayer.GetComponent<AudioSource>().volume = bgmSlider.GetComponent<Slider>().value;
         }
     }
 
