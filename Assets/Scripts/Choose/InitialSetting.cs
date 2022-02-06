@@ -34,6 +34,8 @@ namespace Choose
             audioPlayer.stop();
             audioPlaying = val;
             audioPlayer.play(audioPlaying);
+            PlayerPrefs.SetInt("BGMid", audioPlaying);
+            PlayerPrefs.Save();
             Debug.Log("after: " + audioPlaying);
         }
 
@@ -53,7 +55,6 @@ namespace Choose
         }
         public void OnSettingFinishButtonClicked()
         {
-            PlayerPrefs.SetInt("BGMid", dropDown.GetComponent<Dropdown>().value);
             PlayerPrefs.SetFloat("BGMVolume", bgmSlider.GetComponent<Slider>().value);
             PlayerPrefs.SetFloat("SEVolume", seSlider.GetComponent<Slider>().value);
             PlayerPrefs.Save();
@@ -62,26 +63,32 @@ namespace Choose
 
         public void OnTutorialButtonClicked()
         {
-
+            if (settingPanel.activeSelf) Debug.Log("setting panel is active");
         }
 
         public void ChooseCPU553()
         {
-            xLength = 5;
-            yLength = 3;
-            zLength = 5;
-            gameMode = 0;
-            SceneManager.LoadScene("PvP553");
+            if (!settingPanel.activeSelf)
+            {
+                xLength = 5;
+                yLength = 3;
+                zLength = 5;
+                gameMode = 0;
+                SceneManager.LoadScene("PvP553");
+            }
         }
 
         public void ChoosePvP553()
         {
-            xLength = 5;
-            yLength = 3;
-            zLength = 5;
-            gameMode = 1;
-            if (PlayerPrefs.HasKey("savedGame")) checkPlaySavedGameCanvas.SetActive(true);
-            else SceneManager.LoadScene("PvP553");
+            if (!settingPanel.activeSelf)
+            {
+                xLength = 5;
+                yLength = 3;
+                zLength = 5;
+                gameMode = 1;
+                if (PlayerPrefs.HasKey("savedGame")) checkPlaySavedGameCanvas.SetActive(true);
+                else SceneManager.LoadScene("PvP553");
+            }
         }
 
         public void OnPlaySavedGameYesButton()
