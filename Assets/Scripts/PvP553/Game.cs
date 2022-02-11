@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 
 namespace PvP553
@@ -70,6 +71,9 @@ namespace PvP553
         public Camera upperCamera;
         public Camera underCamera;
         public Camera centerRightCamera;
+
+        public Canvas finishGameCanvas;
+        private GameObject finishGamePanel;
 
         public AudioSource putKomaNormal;
         public AudioSource putKomaShuban;
@@ -217,6 +221,8 @@ namespace PvP553
             }
 
             nariConfirmCanvas.SetActive(false);
+            finishGamePanel = finishGameCanvas.transform.GetChild(0).gameObject;
+
             if (PlayerPrefs.HasKey("playSavedGame"))
             {
                 PlayerPrefs.DeleteKey("playSavedGame");
@@ -347,6 +353,8 @@ namespace PvP553
                 if (GameSet() != 0)
                 {
                     string winner = (turn == 1) ? "先手" : "後手";
+                    finishGameCanvas.gameObject.SetActive(true);
+                    finishGamePanel.transform.GetChild(0).GetComponent<Text>().text = winner + "の勝ちです";
                     Debug.Log(winner + "の勝ち");
                 }
                 putKomaNormal.Play();
@@ -912,7 +920,8 @@ namespace PvP553
                             {
                                 for (int z = 0; z < zLength; z++)
                                 {
-                                    if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), oute))
+                                    if (work[x, y, z] < 0 && work[x, y, z] != -(int)Koma.Kind.Ou && work[x, y, z] != -(int)Koma.Kind.Gyo &&
+                                        CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), oute))
                                     {
                                         //自分が王手をかけている駒を取れる相手の駒全てに対し, 実際に相手が王手の駒を取ると相手の王が取られてしまわないかチェック
                                         bool isOu = (work[x, y, z] == -(int)Koma.Kind.Ou || work[x, y, z] == -(int)Koma.Kind.Gyo) ? true : false;
@@ -970,7 +979,8 @@ namespace PvP553
                                 {
                                     for (int z = 0; z < zLength; z++)
                                     {
-                                        if (work[x, y, z] < 0 && CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), loc))
+                                        if (work[x, y, z] < 0 && work[x, y, z] != -(int)Koma.Kind.Ou && work[x, y, z] != -(int)Koma.Kind.Gyo &&
+                                            CheckMovable_Specific(work, work[x, y, z], -turn, new Vector3Int(x, y, z), loc))
                                         {
                                             int temp = work[loc.x, loc.y, loc.z];
                                             work[loc.x, loc.y, loc.z] = work[x, y, z];
@@ -1356,6 +1366,7 @@ namespace PvP553
             foreach (GameObject box in opMochigomaBox) box.SetActive(false);
             foreach (GameObject box in myMochigomaBox) box.SetActive(false);
         }
+
         public void SetGridButton2D(Button b, int x, int y, int z) { gridButton2D[x, y, z] = b; }
         public Button ChooseResetButton2D { set { chooseResetButton2D = value; } }
         public bool MouseDetectable { get { return mouseDetectable; } set { mouseDetectable = value; } }

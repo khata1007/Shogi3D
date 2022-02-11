@@ -14,11 +14,13 @@ namespace PvP553
         private int zLength = Choose.InitialSetting.zLength;
 
         public Canvas saveConfirmCanvas;
+        public Canvas finishGameCanvas;
         public Game game;
         // Start is called before the first frame update
         void Start()
         {
             saveConfirmCanvas.gameObject.SetActive(false);
+            finishGameCanvas.gameObject.SetActive(false);
         }
 
         // Update is called once per frame
@@ -40,10 +42,12 @@ namespace PvP553
 
         public void OnMattaButtonClick()
         {
+            if (finishGameCanvas.gameObject.activeSelf) return;
             if (game.MouseDetectable) game.Matta();
         }
         public void OnFinishButtonClick()
         {
+            if (finishGameCanvas.gameObject.activeSelf) return;
             //セーブしてシーン遷移
             if (game.MouseDetectable)
             {
@@ -54,10 +58,17 @@ namespace PvP553
         }
         public void OnSaveYesButtonClick()
         {
+            if (finishGameCanvas.gameObject.activeSelf) return;
             game.SaveGame();
             SceneManager.LoadScene("choose");
         }
         public void OnSaveNoButtonClick()
+        {
+            if (finishGameCanvas.gameObject.activeSelf) return;
+            SceneManager.LoadScene("choose");
+        }
+
+        public void OnChooseModeBackButton()
         {
             SceneManager.LoadScene("choose");
         }
